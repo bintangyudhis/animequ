@@ -1,0 +1,37 @@
+@import "tailwindcss";
+
+/* Hallmark · pre-emit critique: P4 H5 E4 S5 R5 V4 */
+/* Hallmark · macrostructure: Marquee + Rails · theme: Layar · genre: editorial
+ * paper: dark (#16120e) · display: grotesk-sans (Archivo, roman, heavy)
+ * accent: warm vermilion (#ff4d24) · nav: edge-aligned sticky bar
+ * footer: statement-line · enrichment: none (typography + real posters only)
+ * motion: none */
+
+@theme inline {
+  --color-paper: #16120e;
+  --color-panel: #221c15;
+  --color-ink: #f2ede3;
+  --color-muted: #a89c8a;
+  --color-accent: #ff4d24;
+  --color-line: #3a322a;
+  --font-sans: var(--font-archivo);
+  --font-mono: var(--font-plex-mono);
+}
+
+html,
+body {
+  /* Pagar anti melebar: halaman tidak boleh bisa digeser menyamping di HP. */
+  overflow-x: clip;
+}
+
+body {
+  background: var(--color-paper);
+  color: var(--color-ink);
+}
+
+/* Fokus keyboard yang jelas di semua elemen interaktif. */
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}

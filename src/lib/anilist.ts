@@ -94,3 +94,24 @@ export function daftarTrending(): Promise<AnimeRingkas[] | null> {
     { perPage: 10 },
   );
 }
+
+export function daftarMusim(
+  season: string,
+  seasonYear: number,
+): Promise<AnimeRingkas[] | null> {
+  return ambilDaftar(
+    `query ($perPage: Int, $season: MediaSeason, $seasonYear: Int) {
+      Page(perPage: $perPage) {
+        media(
+          type: ANIME
+          season: $season
+          seasonYear: $seasonYear
+          sort: POPULARITY_DESC
+        ) {
+          ${FRAGMEN_ANIME}
+        }
+      }
+    }`,
+    { perPage: 12, season, seasonYear },
+  );
+}

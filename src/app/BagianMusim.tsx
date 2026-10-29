@@ -1,3 +1,4 @@
+import { connection } from "next/server";
 import { daftarMusim } from "../lib/anilist";
 import { labelMusim, musimBerjalan } from "../lib/musim";
 import JudulSeksi from "./JudulSeksi";
@@ -5,6 +6,10 @@ import KartuAnime from "./KartuAnime";
 import PesanGagal from "./PesanGagal";
 
 export default async function BagianMusim() {
+  // Musim dihitung dari tanggal saat request: akses dinamis ini membuat
+  // seksi ini di-render per request (di dalam Suspense), bukan di-prerender
+  // saat build — Next 16 menolak `new Date()` saat prerender.
+  await connection();
   const { musim, tahun } = musimBerjalan();
   const daftar = await daftarMusim(musim, tahun);
   return (

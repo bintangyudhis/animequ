@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Archivo, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
 import BilahAtas from "./BilahAtas";
+import KakiHalaman from "./KakiHalaman";
 
 const archivo = Archivo({
   variable: "--font-archivo",
@@ -31,6 +32,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="min-h-full font-sans">
         <BilahAtas />
         <main>{children}</main>
+        <KakiHalaman />
       </body>
     </html>
   );

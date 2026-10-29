@@ -58,6 +58,10 @@ async function ambilDaftar(
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ query, variables }),
+      // Batas 15 detik: AniList yang menggantung (mis. diblokir Cloudflare
+      // dari IP build) tidak boleh menggantung build/render — pemanggil
+      // menerima null dan menampilkan pesan gagal muat.
+      signal: AbortSignal.timeout(15000),
       // Cache 30 menit: cukup segar untuk daftar, hemat kuota AniList.
       next: { revalidate: 1800 },
     });

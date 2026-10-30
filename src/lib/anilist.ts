@@ -123,6 +123,42 @@ export function daftarTrending(): Promise<AnimeRingkas[] | null> {
   );
 }
 
+type ResponsDetail = {
+  data?: { Media?: AnimeDetail };
+};
+
+export async function detailAnime(id: number): Promise<AnimeDetail | null> {
+  try {
+    const respons = await fetch(TITIK_AKHIR, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        query: `query ($id: Int) {
+          Media(id: $id, type: ANIME) {
+            ${FRAGMEN_ANIME}
+            description
+            format
+            status
+            bannerImage
+            trailer { id site }
+            studios { nodes { name } }
+            externalLinks { url site type }
+            startDate { year month day }
+          }
+        }`,
+        variables: { id },
+      }),
+      signal: AbortSignal.timeout(15000),
+      next: { revalidate: 1800 },
+    });
+    if (!respons.ok) return null;
+    const json = (await respons.json()) as ResponsDetail;
+    return json.data?.Media ?? null;
+  } catch {
+    return null;
+  }
+}
+
 export function daftarMusim(
   season: string,
   seasonYear: number,

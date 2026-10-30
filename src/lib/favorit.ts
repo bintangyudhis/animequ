@@ -29,6 +29,22 @@ export function bacaFavorit(): AnimeFavorit[] {
   }
 }
 
+export function isFavorit(id: number): boolean {
+  return bacaFavorit().some((item) => item.id === id);
+}
+
+// Mengembalikan true bila setelah aksi ini judul menjadi favorit.
+export function toggleFavorit(item: AnimeFavorit): boolean {
+  const daftar = bacaFavorit();
+  const sudah = daftar.some((favorit) => favorit.id === item.id);
+  simpanFavorit(
+    sudah
+      ? daftar.filter((favorit) => favorit.id !== item.id)
+      : [...daftar, item],
+  );
+  return !sudah;
+}
+
 export function simpanFavorit(daftar: AnimeFavorit[]): void {
   try {
     window.localStorage.setItem(KUNCI, JSON.stringify(daftar));

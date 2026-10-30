@@ -3,16 +3,14 @@ import type { AnimeRingkas } from "../lib/anilist";
 import { judulTampil, skorTampil } from "../lib/anilist";
 import { episodeTampil } from "../lib/musim";
 
-// Kartu poster: poster di atas, judul + meta di bawah. Tautan keluar ke
-// halaman AniList judul itu (halaman detail lokal menyusul Day 12).
+// Kartu poster: poster di atas, judul + meta di bawah. Tautan ke halaman
+// detail lokal judul itu (Day 12); tautan keluar ke AniList pindah ke
+// halaman detail.
 export default function KartuAnime({ anime }: { anime: AnimeRingkas }) {
   const poster = anime.coverImage.large;
-  const href = anime.siteUrl ?? "#";
   return (
     <a
-      href={href}
-      target={anime.siteUrl ? "_blank" : undefined}
-      rel={anime.siteUrl ? "noreferrer" : undefined}
+      href={`/anime/${anime.id}`}
       className="group block border border-line bg-panel transition-colors hover:border-accent"
     >
       <div className="relative aspect-[3/4] w-full overflow-hidden bg-panel">

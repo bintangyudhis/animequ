@@ -2,19 +2,28 @@
 
 Website informasi anime yang datanya diambil dari AniList API (GraphQL,
 gratis, tanpa API key). Pengunjung bisa melihat anime yang sedang tayang,
-yang sedang tren, dan chart musim berjalan. Halaman detail, pencarian,
-favorit, dan riwayat menyusul sesuai rencana harian.
+yang sedang tren, dan chart musim berjalan, mencari judul, membuka halaman
+detail, dan menyimpan favorit di browsernya sendiri. Riwayat menyusul
+sesuai rencana harian.
 
 Situs ini tidak menyediakan video bajakan: "nonton" di sini berarti
 trailer dan tautan ke platform streaming resmi.
 
-## Fitur (Day 11)
+## Fitur (Day 11–12)
 
 - Beranda: anime yang sedang tayang (status RELEASING, urut popularitas)
 - Beranda: 10 anime trending dari AniList
 - Beranda: chart musim berjalan (musim dihitung dari tanggal render)
 - Kartu poster dengan skor, info episode berikutnya, dan genre
 - Data di-cache 30 menit per daftar agar hemat kuota AniList
+- Pencarian (`/cari?q=...`, urut SEARCH_MATCH, hasil bisa dibagikan
+  lewat URL) + kolom cari di bilah atas
+- Halaman detail (`/anime/[id]`): sinopsis, genre, skor, format, status,
+  studio, tahun mulai, trailer YouTube, tautan platform streaming resmi
+  dari AniList, dan tautan AniList; ID tak dikenal → 404
+- Favorit (localStorage, tanpa akun): tombol simpan di halaman detail +
+  halaman `/favorit` dengan hapus per judul; kartu beranda dan daftar
+  trending kini menaut ke detail lokal, bukan keluar ke AniList
 
 ## Teknologi
 
@@ -40,8 +49,6 @@ npm run build
 
 ## Rencana berikutnya
 
-- Day 12: pencarian + halaman detail (sinopsis, genre, skor, studio,
-  trailer, tautan platform resmi) + favorit (localStorage)
 - Day 13: jadwal rilis mingguan + chart top anime + histori tontonan
   (localStorage)
 - Day 14: polish UI + README final

@@ -12,9 +12,7 @@ export default function DaftarTren({ daftar }: { daftar: AnimeRingkas[] }) {
         return (
           <li key={anime.id}>
             <a
-              href={anime.siteUrl ?? "#"}
-              target={anime.siteUrl ? "_blank" : undefined}
-              rel={anime.siteUrl ? "noreferrer" : undefined}
+              href={`/anime/${anime.id}`}
               className="group flex items-center gap-4 py-3 transition-colors hover:bg-panel sm:gap-6"
             >
               <span className="w-10 shrink-0 text-right text-2xl font-black text-muted group-hover:text-accent sm:text-3xl">

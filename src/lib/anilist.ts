@@ -84,6 +84,19 @@ async function ambilDaftar(
   }
 }
 
+export function cariAnime(kataKunci: string): Promise<AnimeRingkas[] | null> {
+  return ambilDaftar(
+    `query ($perPage: Int, $search: String) {
+      Page(perPage: $perPage) {
+        media(type: ANIME, search: $search, sort: SEARCH_MATCH) {
+          ${FRAGMEN_ANIME}
+        }
+      }
+    }`,
+    { perPage: 24, search: kataKunci },
+  );
+}
+
 export function daftarSedangTayang(): Promise<AnimeRingkas[] | null> {
   return ambilDaftar(
     `query ($perPage: Int) {

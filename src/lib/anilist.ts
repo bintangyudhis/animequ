@@ -22,6 +22,17 @@ export function judulTampil(anime: AnimeRingkas): string {
   return anime.title.romaji ?? anime.title.english ?? "Judul belum tersedia";
 }
 
+export type AnimeDetail = AnimeRingkas & {
+  description: string | null;
+  format: string | null;
+  status: string | null;
+  bannerImage: string | null;
+  trailer: { id: string | null; site: string | null } | null;
+  studios: { nodes: { name: string | null }[] | null } | null;
+  externalLinks: { url: string | null; site: string | null; type: string | null }[] | null;
+  startDate: { year: number | null; month: number | null; day: number | null } | null;
+};
+
 export function skorTampil(anime: AnimeRingkas): string {
   if (anime.averageScore === null) return "—";
   return (anime.averageScore / 10).toFixed(1);

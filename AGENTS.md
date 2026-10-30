@@ -25,6 +25,20 @@
 - Kartu untuk sementara menaut keluar ke halaman AniList judul itu
   (siteUrl); halaman detail lokal adalah fitur Day 12.
 
+## Pelajaran Day 12 (pencarian + detail + favorit)
+
+- Issue #3 (detail + pencarian) dan #4 (favorit) ditutup lewat commit
+  yang memuat `Closes #3` / `Closes #4` di pesannya saat push ke main.
+- Halaman detail memakai `notFound()` untuk id non-numerik dan detail
+  null; route `/anime/[id]` dan `/cari` berstatus Partial Prerender (◐)
+  di build, `/favorit` statis (daftar dibaca klien dari localStorage).
+- Favorit: kunci `animequ-favorit-v1`, event `animequ:favorit` untuk
+  sinkronisasi daftar antar komponen; tombol membaca localStorage di
+  useEffect (bukan render server) supaya tidak ada hydration mismatch.
+- Build Day 12 lolos cepat (~18 detik, 6 halaman) — tidak ada lagi
+  timeout AniList 15 detik seperti Day 11; fetch detail/cari hanya jalan
+  per request, bukan saat prerender.
+
 ## Pelajaran Day 11 lanjutan (build beranda penuh)
 
 - Fetch AniList WAJIB dibatasi waktu (`AbortSignal.timeout(15000)`):

@@ -10,8 +10,9 @@ export default function HeroBeranda() {
       <p className="max-w-2xl text-base leading-relaxed text-muted sm:text-lg">
         Lihat apa yang sedang rilis minggu ini, apa yang sedang ramai
         dibicarakan, dan apa saja judul musim berjalan. Klik sebuah judul
-        untuk membuka halaman AniList-nya; halaman detail, pencarian,
-        favorit, dan riwayat menyusul di hari berikutnya.
+        untuk membuka detailnya, lengkap dengan trailer dan tautan
+        nonton resmi. Cari judul, simpan favoritmu, dan lihat kembali
+        riwayat tontonanmu.
       </p>
     </section>
   );

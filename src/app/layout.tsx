@@ -19,7 +19,7 @@ const plexMono = IBM_Plex_Mono({
 export const metadata: Metadata = {
   title: "Animequ — Anime yang Sedang Tayang & Trending",
   description:
-    "Animequ menampilkan anime yang sedang tayang, yang sedang tren, dan chart musim ini dari data AniList. Tanpa video bajakan: trailer dan tautan ke platform resmi.",
+    "Animequ menampilkan anime yang sedang tayang, yang sedang tren, chart musim ini, jadwal rilis mingguan, dan top anime dari data AniList, plus favorit dan histori yang tersimpan di browsermu. Tanpa video bajakan: trailer dan tautan ke platform resmi.",
   icons: { icon: "/favicon.svg" },
 };
 

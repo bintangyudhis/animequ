@@ -159,6 +159,82 @@ export async function detailAnime(id: number): Promise<AnimeDetail | null> {
   }
 }
 
+export type JadwalTayang = {
+  airingAt: number;
+  episode: number;
+  media: {
+    id: number;
+    title: JudulAnime;
+    coverImage: { large: string | null };
+    averageScore: number | null;
+    genres: string[] | null;
+  };
+};
+
+type ResponsJadwal = {
+  data?: { Page?: { airingSchedules?: JadwalTayang[] } };
+};
+
+// Jadwal tayang 7 hari ke depan dari AniList: episode yang akan mengudara
+// dalam rentang airingAt yang diminta, diurutkan berdasarkan waktu tayang.
+export async function daftarJadwal(
+  dariDetik: number,
+  sampaiDetik: number,
+): Promise<JadwalTayang[] | null> {
+  try {
+    const respons = await fetch(TITIK_AKHIR, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        query: `query ($perPage: Int, $airingAt_greater: Int, $airingAt_lesser: Int) {
+          Page(perPage: $perPage) {
+            airingSchedules(
+              airingAt_greater: $airingAt_greater
+              airingAt_lesser: $airingAt_lesser
+              sort: TIME
+            ) {
+              airingAt
+              episode
+              media {
+                id
+                title { romaji english }
+                coverImage { large }
+                averageScore
+                genres
+              }
+            }
+          }
+        }`,
+        variables: {
+          perPage: 50,
+          airingAt_greater: dariDetik,
+          airingAt_lesser: sampaiDetik,
+        },
+      }),
+      signal: AbortSignal.timeout(15000),
+      next: { revalidate: 1800 },
+    });
+    if (!respons.ok) return null;
+    const json = (await respons.json()) as ResponsJadwal;
+    return json.data?.Page?.airingSchedules ?? null;
+  } catch {
+    return null;
+  }
+}
+
+export function daftarTop(): Promise<AnimeRingkas[] | null> {
+  return ambilDaftar(
+    `query ($perPage: Int) {
+      Page(perPage: $perPage) {
+        media(type: ANIME, sort: SCORE_DESC) {
+          ${FRAGMEN_ANIME}
+        }
+      }
+    }`,
+    { perPage: 50 },
+  );
+}
+
 export function daftarMusim(
   season: string,
   seasonYear: number,

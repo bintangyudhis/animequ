@@ -39,6 +39,28 @@
   timeout AniList 15 detik seperti Day 11; fetch detail/cari hanya jalan
   per request, bukan saat prerender.
 
+## Pelajaran Day 13 (jadwal + chart + histori)
+
+- Issue #5 (jadwal + chart) tertutup oleh commit query pertama Day 13
+  yang memuat `Closes #5` — lebih awal dari selesainya fitur, karena
+  penanda itu langsung menutup issue saat push. Pelajaran: tulis
+  `Closes #n` hanya di commit terakhir fitur itu. Issue #6 (histori)
+  ditutup lewat badan pesan commit deploy Day 13, setelah semua fitur
+  histori selesai dan ter-push.
+- Jadwal memakai query AiringSchedule AniList (airingAt_greater/lesser,
+  sort TIME, 50 entri) + `await connection()` sebelum menghitung
+  rentang 7 hari, pola yang sama seperti BagianMusim (new Date saat
+  prerender ditolak Next 16). Pengelompokan per hari memakai kunci
+  YYYY-MM-DD dalam WIB (Intl.DateTimeFormat Asia/Jakarta), bukan UTC.
+- Histori meniru pola favorit (localStorage + event kustom
+  `animequ:histori`, baca setelah mount, maks 50 entri, terbaru di
+  depan, dedupe per id). Pencatatan lewat komponen klien tanpa tampilan
+  di halaman detail, bukan di render server.
+- Sapuan keamanan ringan Day 13: tidak ada permukaan baru yang perlu
+  diaudit — tidak ada endpoint/auth/upload baru; hanya bacaan publik
+  AniList (tanpa kunci, tanpa data pengguna) dan localStorage yang
+  tidak pernah dikirim ke server. Tidak ada secret yang di-commit.
+
 ## Pelajaran Day 11 lanjutan (build beranda penuh)
 
 - Fetch AniList WAJIB dibatasi waktu (`AbortSignal.timeout(15000)`):

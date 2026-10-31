@@ -4,7 +4,10 @@ const TAUTAN = [
   { href: "/#sedang-tayang", label: "Sedang Tayang" },
   { href: "/#trending", label: "Trending" },
   { href: "/#musim-ini", label: "Musim Ini" },
+  { href: "/jadwal", label: "Jadwal" },
+  { href: "/peringkat", label: "Top" },
   { href: "/favorit", label: "Favorit" },
+  { href: "/histori", label: "Histori" },
 ];
 
 // Bilah atas: wordmark, tautan seksi beranda (pakai path "/" supaya tetap

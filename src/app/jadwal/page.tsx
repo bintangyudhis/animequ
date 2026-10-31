@@ -3,6 +3,7 @@ import { daftarJadwal } from "../../lib/anilist";
 import { kelompokkanPerHari, labelHariWib, rentangJadwal } from "../../lib/jadwal";
 import PesanGagal from "../PesanGagal";
 import BarisJadwal from "./BarisJadwal";
+import DaftarHari from "./DaftarHari";
 
 // Jadwal rilis 7 hari ke depan, dikelompokkan per hari WIB. Tanggal
 // dihitung saat request (lihat BagianMusim): `await connection()`
@@ -32,8 +33,14 @@ export default async function Jadwal() {
           AniList saat ini.
         </p>
       ) : (
-        perHari.map(({ kunci, item }) => (
-          <section key={kunci} className="flex flex-col gap-3">
+        <>
+          <DaftarHari kunciHari={perHari.map(({ kunci }) => kunci)} />
+          {perHari.map(({ kunci, item }) => (
+          <section
+            key={kunci}
+            id={`hari-${kunci}`}
+            className="flex scroll-mt-20 flex-col gap-3"
+          >
             <h2 className="border-b-2 border-accent pb-2 text-xl font-black tracking-tight">
               {labelHariWib(kunci)}
             </h2>
@@ -45,7 +52,8 @@ export default async function Jadwal() {
               ))}
             </ul>
           </section>
-        ))
+          ))}
+        </>
       )}
     </div>
   );

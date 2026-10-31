@@ -5,6 +5,7 @@ import { labelFormat, labelStatus } from "../../../lib/labelDetail";
 import { bersihkanDeskripsi } from "../../../lib/teks";
 import { episodeTampil } from "../../../lib/musim";
 import TombolFavorit from "../../TombolFavorit";
+import PencatatHistori from "./PencatatHistori";
 import TrailerAnime from "./TrailerAnime";
 import TautanResmi from "./TautanResmi";
 
@@ -31,6 +32,7 @@ export default async function DetailAnime({
 
   return (
     <div className="mx-auto flex max-w-6xl flex-col gap-10 px-4 py-10 sm:px-6 sm:py-14">
+      <PencatatHistori id={anime.id} judul={judul} poster={poster} />
       <div className="flex flex-col gap-8 sm:flex-row">
         <div className="relative aspect-[3/4] w-full shrink-0 overflow-hidden border border-line bg-panel sm:w-64">
           {poster ? (

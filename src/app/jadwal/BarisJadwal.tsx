@@ -12,7 +12,7 @@ export default function BarisJadwal({ tayang }: { tayang: JadwalTayang }) {
   return (
     <a
       href={`/anime/${media.id}`}
-      className="group flex items-center gap-4 border border-line bg-panel px-3 py-3 transition-colors hover:border-accent sm:px-4"
+      className="group flex items-center gap-3 border border-line bg-panel px-3 py-3 transition-colors hover:border-accent sm:gap-4 sm:px-4"
     >
       <span className="w-12 shrink-0 font-mono text-sm font-bold text-accent">
         {jamWib(tayang.airingAt)}

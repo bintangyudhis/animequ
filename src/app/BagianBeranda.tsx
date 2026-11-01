@@ -11,18 +11,28 @@ export function BagianBeranda() {
     <>
       <Suspense
         fallback={
-          <p className="text-sm text-muted">Memuat anime yang sedang tayang…</p>
+          <p className="border border-line bg-panel p-4 text-sm text-muted">
+            Memuat anime yang sedang tayang…
+          </p>
         }
       >
         <BagianSedangTayang />
       </Suspense>
       <Suspense
-        fallback={<p className="text-sm text-muted">Memuat daftar trending…</p>}
+        fallback={
+          <p className="border border-line bg-panel p-4 text-sm text-muted">
+            Memuat daftar trending…
+          </p>
+        }
       >
         <BagianTrending />
       </Suspense>
       <Suspense
-        fallback={<p className="text-sm text-muted">Memuat chart musim ini…</p>}
+        fallback={
+          <p className="border border-line bg-panel p-4 text-sm text-muted">
+            Memuat chart musim ini…
+          </p>
+        }
       >
         <BagianMusim />
       </Suspense>

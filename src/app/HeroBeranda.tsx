@@ -4,7 +4,7 @@ export default function HeroBeranda() {
       <p className="font-mono text-xs tracking-widest text-accent uppercase">
         Data: AniList · diperbarui tiap 30 menit
       </p>
-      <h1 className="max-w-3xl text-4xl leading-[1.05] font-black tracking-tight sm:text-6xl">
+      <h1 className="max-w-3xl text-4xl leading-[1.05] font-black tracking-tight sm:text-5xl lg:text-6xl">
         Anime yang sedang tayang, tanpa ribet.
       </h1>
       <p className="max-w-2xl text-base leading-relaxed text-muted sm:text-lg">

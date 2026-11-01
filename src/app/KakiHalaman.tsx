@@ -11,6 +11,26 @@ export default function KakiHalaman() {
           memutar video apa pun: yang tersedia di sini hanya informasi,
           trailer, dan tautan ke platform streaming resmi.
         </p>
+        <nav
+          aria-label="Tautan situs"
+          className="flex flex-wrap gap-x-5 gap-y-2 text-sm font-bold"
+        >
+          <a href="/cari" className="hover:text-accent">
+            Cari
+          </a>
+          <a href="/jadwal" className="hover:text-accent">
+            Jadwal
+          </a>
+          <a href="/peringkat" className="hover:text-accent">
+            Top anime
+          </a>
+          <a href="/favorit" className="hover:text-accent">
+            Favorit
+          </a>
+          <a href="/histori" className="hover:text-accent">
+            Histori
+          </a>
+        </nav>
         <p className="font-mono text-xs text-muted">
           Sumber data: graphql.anilist.co
         </p>

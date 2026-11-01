@@ -12,7 +12,8 @@ export default function JudulSeksi({
       <h2 className="text-2xl font-black tracking-tight sm:text-3xl">
         {judul}
       </h2>
-      <p className="mt-1 text-sm text-muted">{keterangan}</p>
+      <span aria-hidden="true" className="mt-3 block h-1 w-10 bg-accent" />
+      <p className="mt-2 text-sm text-muted">{keterangan}</p>
     </div>
   );
 }

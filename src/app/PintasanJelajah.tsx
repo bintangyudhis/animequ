@@ -29,9 +29,9 @@ export default function PintasanJelajah() {
           <li key={item.href}>
             <Link
               href={item.href}
-              className="group block border border-line bg-panel p-4 transition-colors hover:border-accent"
+              className="group block border border-line bg-panel p-5 transition-colors hover:border-accent"
             >
-              <span className="block text-sm font-bold group-hover:text-accent">
+              <span className="block text-base font-bold group-hover:text-accent">
                 {item.judul} →
               </span>
               <span className="mt-1 block text-xs leading-relaxed text-muted">

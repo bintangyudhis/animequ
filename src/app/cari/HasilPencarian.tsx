@@ -24,10 +24,10 @@ export default async function HasilPencarian({
   }
   return (
     <div>
-      <p className="mb-5 font-mono text-sm text-muted">
+      <p className="mb-5 text-sm font-bold">
         {daftar.length} judul ditemukan
       </p>
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
         {daftar.map((anime) => (
           <KartuAnime key={anime.id} anime={anime} />
         ))}

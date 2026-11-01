@@ -13,7 +13,7 @@ export default function DaftarTren({ daftar }: { daftar: AnimeRingkas[] }) {
           <li key={anime.id}>
             <a
               href={`/anime/${anime.id}`}
-              className="group flex items-center gap-4 py-3 transition-colors hover:bg-panel sm:gap-6"
+              className="group flex items-center gap-4 px-2 py-3 transition-colors hover:bg-panel sm:gap-6 sm:px-3"
             >
               <span className="w-10 shrink-0 text-right text-2xl font-black text-muted group-hover:text-accent sm:text-3xl">
                 {String(indeks + 1).padStart(2, "0")}

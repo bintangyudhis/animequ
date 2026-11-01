@@ -15,6 +15,7 @@ export default function FormulirPencarian({
         name="q"
         type="search"
         defaultValue={nilaiAwal}
+        maxLength={100}
         placeholder="Mis. Frieren, One Piece…"
         className="min-w-0 flex-1 border border-line bg-panel px-4 py-3 text-base placeholder:text-muted focus:border-accent focus:outline-none"
       />

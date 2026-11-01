@@ -45,7 +45,9 @@ export default function BarisPeringkat({
           {anime.seasonYear ? ` · ${anime.seasonYear}` : ""}
         </span>
       </span>
-      <span className="shrink-0 text-sm font-bold">★ {skorTampil(anime)}</span>
+      <span className="shrink-0 font-mono text-sm font-bold">
+        ★ {skorTampil(anime)}
+      </span>
     </a>
   );
 }

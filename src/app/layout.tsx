@@ -30,8 +30,14 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${archivo.variable} ${plexMono.variable} h-full antialiased`}
     >
       <body className="min-h-full font-sans">
+        <a
+          href="#konten"
+          className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-100 focus:bg-accent focus:px-4 focus:py-2 focus:text-sm focus:font-bold focus:text-paper"
+        >
+          Lewati ke konten
+        </a>
         <BilahAtas />
-        <main>{children}</main>
+        <main id="konten">{children}</main>
         <KakiHalaman />
       </body>
     </html>

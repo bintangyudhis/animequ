@@ -10,7 +10,7 @@ export default function DaftarHari({ kunciHari }: { kunciHari: string[] }) {
         <a
           key={kunci}
           href={`#hari-${kunci}`}
-          className="border border-line bg-panel px-3 py-1 text-xs font-bold transition-colors hover:border-accent hover:text-accent"
+          className="border border-line bg-panel px-3 py-2 text-xs font-bold transition-colors hover:border-accent hover:text-accent"
         >
           {labelHariWib(kunci)}
         </a>

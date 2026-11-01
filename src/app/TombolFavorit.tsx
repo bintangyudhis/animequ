@@ -29,7 +29,7 @@ export default function TombolFavorit({
       disabled={!siap}
       aria-pressed={tersimpan}
       onClick={() => setTersimpan(toggleFavorit({ id, judul, poster }))}
-      className="border border-accent px-5 py-3 text-sm font-bold text-accent transition-colors hover:bg-accent hover:text-paper disabled:opacity-50"
+      className="border border-accent px-5 py-3 text-sm font-bold text-accent transition-colors hover:bg-accent hover:text-paper disabled:cursor-not-allowed disabled:opacity-50"
     >
       {tersimpan ? "★ Tersimpan di favorit" : "☆ Simpan ke favorit"}
     </button>

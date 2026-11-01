@@ -39,7 +39,7 @@ export default function DaftarHistori() {
         <button
           type="button"
           onClick={() => simpanHistori([])}
-          className="border border-line px-4 py-2 text-sm font-bold text-muted transition-colors hover:border-accent hover:text-accent"
+          className="border border-line px-4 py-3 text-sm font-bold text-muted transition-colors hover:border-accent hover:text-accent"
         >
           Hapus semua histori
         </button>
@@ -48,7 +48,7 @@ export default function DaftarHistori() {
         {daftar.map((item) => (
           <li
             key={item.id}
-            className="group flex items-center gap-4 border border-line bg-panel px-3 py-3 sm:px-4"
+            className="group flex items-center gap-4 border border-line bg-panel px-3 py-3 transition-colors hover:border-accent sm:px-4"
           >
             <Link
               href={`/anime/${item.id}`}
@@ -88,7 +88,7 @@ export default function DaftarHistori() {
               onClick={() =>
                 simpanHistori(daftar.filter((histori) => histori.id !== item.id))
               }
-              className="shrink-0 px-2 py-1 text-xs font-bold text-muted transition-colors hover:text-accent"
+              className="shrink-0 px-2 py-3 text-xs font-bold text-muted transition-colors hover:text-accent"
             >
               Hapus
             </button>

@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { detailAnime, judulTampil, skorTampil } from "../../../lib/anilist";
 import { labelFormat, labelStatus } from "../../../lib/labelDetail";
@@ -33,6 +34,12 @@ export default async function DetailAnime({
   return (
     <div className="mx-auto flex max-w-6xl flex-col gap-10 px-4 py-10 sm:px-6 sm:py-14">
       <PencatatHistori id={anime.id} judul={judul} poster={poster} />
+      <Link
+        href="/"
+        className="w-fit text-sm font-bold text-muted transition-colors hover:text-accent"
+      >
+        ← Kembali ke beranda
+      </Link>
       <div className="flex flex-col gap-8 sm:flex-row">
         <div className="relative aspect-[3/4] w-full shrink-0 overflow-hidden border border-line bg-panel sm:w-64">
           {poster ? (
@@ -101,7 +108,7 @@ export default async function DetailAnime({
               <a
                 href={anime.siteUrl}
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
                 className="border border-line px-5 py-3 text-sm font-bold transition-colors hover:border-accent hover:text-accent"
               >
                 Lihat di AniList
@@ -110,8 +117,10 @@ export default async function DetailAnime({
           </div>
         </div>
       </div>
-      <section className="flex max-w-3xl flex-col gap-3">
-        <h2 className="text-xl font-black tracking-tight">Sinopsis</h2>
+      <section className="flex max-w-3xl flex-col gap-4">
+        <h2 className="border-b border-line pb-2 text-xl font-black tracking-tight">
+          Sinopsis
+        </h2>
         <p className="text-base leading-relaxed text-muted">
           {sinopsis || "Sinopsis belum tersedia untuk judul ini."}
         </p>

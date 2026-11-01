@@ -35,11 +35,15 @@ export default function BilahAtas() {
             id="cari-bilah"
             name="q"
             type="search"
+            maxLength={100}
             placeholder="Cari anime…"
             className="w-full max-w-xs border border-line bg-panel px-3 py-2 text-sm placeholder:text-muted focus:border-accent focus:outline-none"
           />
         </form>
-        <nav className="flex items-center gap-4 text-sm font-medium sm:gap-6">
+        <nav
+          aria-label="Navigasi utama"
+          className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm font-medium sm:gap-x-6"
+        >
           {TAUTAN.map((tautan) => (
             <Link
               key={tautan.href}

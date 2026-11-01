@@ -76,3 +76,30 @@
 - Build halaman penuh dari VM memakan ~15 detik di tahap prerender
   karena tiga fetch AniList menunggu timeout (IP VM diblokir
   Cloudflare); di Vercel fetch yang sama semestinya jauh lebih cepat.
+
+## Pelajaran Day 14 (polish + sapuan keamanan penuh)
+
+- Polish dikerjakan per berkas (26 commit kode + README + catatan
+  ini), bukan satu commit besar: tiap berkas satu unit — fokus dan
+  seleksi di globals, tautan lewati di layout, nav/footer, hero,
+  judul seksi, kartu, grid, fallback/loading dalam panel, halaman
+  detail (tautan kembali, rel noopener, judul bergaris), trailer,
+  tautan resmi, tombol favorit, pencarian (maxLength 100 di bilah
+  dan formulir), hasil cari, favorit/histori, jadwal, peringkat,
+  trending, pintasan, dan pesan gagal berjudul.
+- Repo sempat dalam keadaan HEAD detached di commit yang sama dengan
+  main (e351699) — sebelum kerja, `git checkout main` dulu supaya
+  commit baru tidak menggantung di detached HEAD.
+- Sapuan keamanan penuh Day 14: histori git bersih dari secret
+  (satu-satunya hit grep adalah kalimat prose "tidak ada secret"),
+  tidak ada berkas .env yang ter-track, tidak ada
+  `dangerouslySetInnerHTML` atau `NEXT_PUBLIC_*`, semua tautan
+  eksternal kini `rel="noopener noreferrer"`, pencarian dibatasi
+  100 karakter, fetch AniList hanya ke host tetap
+  graphql.anilist.co (kata kunci hanya jadi variabel GraphQL, bukan
+  URL), dan tidak ada endpoint/auth/upload sama sekali di situs ini.
+  Satu celah verifikasi: `npm audit` gagal dari VM (endpoint audit
+  registry ditolak proxy egress), jadi audit dependensi tidak
+  terverifikasi — dicatat jujur di README, bukan diklaim lolos.
+  Tidak ada dependensi baru pada Day 14, jadi risikonya tetap sama
+  seperti Day 11–13.

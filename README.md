@@ -10,7 +10,7 @@ dibuka.
 Situs ini tidak menyediakan video bajakan: "nonton" di sini berarti
 trailer dan tautan ke platform streaming resmi.
 
-## Fitur (Day 11–13)
+## Fitur (Day 11–14)
 
 - Beranda: anime yang sedang tayang (status RELEASING, urut popularitas)
 - Beranda: 10 anime trending dari AniList
@@ -33,6 +33,11 @@ trailer dan tautan ke platform streaming resmi.
 - Histori tontonan (localStorage, tanpa akun): setiap halaman detail
   yang dibuka tercatat otomatis (terbaru di atas, maks 50 entri) +
   halaman `/histori` dengan hapus per judul dan hapus semua
+- Polish Day 14: tema gelap "Layar" diseragamkan (fokus keyboard di
+  semua input, seleksi aksen, tautan lewati ke konten, footer
+  bertautan rute, loading dan pesan gagal dalam panel, tombol dan
+  baris daftar mudah disentuh di HP, judul dan grid selaras di semua
+  halaman) — tanpa gradasi, tanpa emoji, tanpa angka karangan
 
 ## Teknologi
 
@@ -56,9 +61,26 @@ kunci. Build lokal:
 npm run build
 ```
 
-## Rencana berikutnya
+## Halaman
 
-- Day 14: polish UI + README final
+- `/` beranda: sedang tayang, trending, chart musim ini
+- `/cari?q=...` pencarian (hasil bisa dibagikan lewat URL)
+- `/anime/[id]` detail: sinopsis, trailer, tautan platform resmi
+- `/jadwal` jadwal rilis 7 hari ke depan per hari WIB
+- `/peringkat` chart top 50 anime
+- `/favorit` dan `/histori` (localStorage, tanpa akun)
+
+## Status
+
+Project animequ selesai pada Day 14 (1 Nov 2026): semua fitur Day
+11–14 sudah di-push, build lolos, dan sapuan keamanan penuh Day 14
+tidak menemukan secret di repo maupun histori git, tidak ada
+`dangerouslySetInnerHTML` atau variabel `NEXT_PUBLIC_*`, tautan
+eksternal memakai `rel="noopener noreferrer"`, dan kata kunci
+pencarian dibatasi 100 karakter. Satu catatan: `npm audit` tidak
+bisa jalan dari VM ini (endpoint audit registry ditolak proxy),
+jadi audit dependensi tidak terverifikasi hari ini; tidak ada
+dependensi baru yang ditambahkan pada Day 14.
 
 ## Lisensi
 

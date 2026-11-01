@@ -23,10 +23,18 @@ export default function DaftarFavorit() {
   }
   if (daftar.length === 0) {
     return (
-      <p className="border border-line bg-panel p-4 text-sm leading-relaxed text-muted">
-        Belum ada favorit. Buka halaman detail sebuah anime, lalu tekan
-        “Simpan ke favorit” — daftar ini tersimpan di browser ini saja.
-      </p>
+      <div className="flex flex-col gap-4 border border-line bg-panel p-4">
+        <p className="text-sm leading-relaxed text-muted">
+          Belum ada favorit. Buka halaman detail sebuah anime, lalu tekan
+          “Simpan ke favorit” — daftar ini tersimpan di browser ini saja.
+        </p>
+        <Link
+          href="/cari"
+          className="w-fit border border-accent px-4 py-2 text-sm font-bold text-accent transition-colors hover:bg-accent hover:text-paper"
+        >
+          Cari anime
+        </Link>
+      </div>
     );
   }
   return (
@@ -61,7 +69,7 @@ export default function DaftarFavorit() {
             onClick={() =>
               simpanFavorit(daftar.filter((favorit) => favorit.id !== item.id))
             }
-            className="w-full border-t border-line px-3 py-2 text-left text-xs font-bold text-muted transition-colors hover:text-accent"
+            className="w-full border-t border-line px-3 py-3 text-left text-xs font-bold text-muted transition-colors hover:text-accent"
           >
             Hapus dari favorit
           </button>

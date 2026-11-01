@@ -12,7 +12,7 @@ export default function TautanResmi({
   if (streaming.length === 0) return null;
   return (
     <section className="flex flex-col gap-4">
-      <h2 className="text-xl font-black tracking-tight">
+      <h2 className="border-b border-line pb-2 text-xl font-black tracking-tight">
         Tonton di platform resmi
       </h2>
       <ul className="flex flex-wrap gap-2">
@@ -21,10 +21,10 @@ export default function TautanResmi({
             <a
               href={item.url ?? "#"}
               target="_blank"
-              rel="noreferrer"
+              rel="noopener noreferrer"
               className="block border border-line bg-panel px-4 py-2 text-sm font-bold transition-colors hover:border-accent hover:text-accent"
             >
-              {item.site}
+              {item.site} ↗
             </a>
           </li>
         ))}

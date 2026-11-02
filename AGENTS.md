@@ -151,3 +151,11 @@
   Kunci di env server YOUTUBE_API_KEY (Vercel), TIDAK di repo.
   Tanpa kunci / tidak ketemu: fallback pencarian dalam kanal.
   Cache fetch 24 jam menjaga kuota (10rb unit/hari bawaan Google).
+- Pemutar embed di situs (2 Nov 2026 malam, permintaan Yudhis):
+  temuan Muse kini juga membawa ID mentah; TautanResmi merender
+  iframe youtube-nocookie (videoseries?list= untuk playlist,
+  /embed/<id> untuk video), pola sama dengan TrailerAnime.
+  Videonya tetap dari server YouTube, jadi tetap tanpa database.
+  Batas yang harus diingat: pemilik kanal bisa mematikan embed per
+  video dan lisensi wilayah tetap berlaku per penonton; tombol
+  eksternal selalu dipertahankan sebagai cadangan.

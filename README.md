@@ -45,11 +45,15 @@ trailer dan tautan ke platform streaming resmi.
   menjadi tombol utama "Nonton di Crunchyroll" di atas tautan
   platform resmi lainnya. Tautan membuka situs Crunchyroll, login
   dan langganan diatur Crunchyroll sendiri
-- Nonton gratis di YouTube Muse Indonesia: setiap halaman detail
-  memuat tombol pencarian judul itu di dalam kanal resmi
-  @MuseIndonesia (anime berlisensi, subtitle Indonesia, gratis).
-  AniList tidak menyediakan tautan per judul ke kanal ini, jadi
-  yang ditautkan adalah pencariannya, bukan tautan episode
+- Nonton gratis di YouTube Muse Indonesia: halaman detail mencari
+  judul itu di kanal resmi @MuseIndonesia lewat YouTube Data API.
+  Bila ketemu, videonya bisa ditonton LANGSUNG di halaman ini lewat
+  pemutar embed resmi YouTube (playlist diputar sebagai seri),
+  tanpa pindah situs dan tanpa database, karena video tetap
+  dilayani server YouTube. Bila tidak ketemu, tersedia tombol
+  pencarian judul itu di dalam kanalnya. Sebagian video bisa
+  dibatasi pemilik kanal untuk embed atau wilayah, itu keputusan
+  YouTube dan pemilik lisensi, bukan situs ini
 - Polish Day 14: tema gelap "Layar" diseragamkan (fokus keyboard di
   semua input, seleksi aksen, tautan lewati ke konten, footer
   bertautan rute, loading dan pesan gagal dalam panel, tombol dan

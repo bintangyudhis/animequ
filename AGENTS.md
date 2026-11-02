@@ -168,3 +168,12 @@
   (termasuk "Musim ke Dua"), dan uji inti judul terpadatkan dengan
   ekor sah terbatas. Prinsip: tidak ada tautan langsung lebih baik
   daripada tautan langsung yang salah judul.
+- KUOTA API HABIS (2 Nov 2026 ~19:00): YouTube Data API memberi
+  10.000 unit/hari dan search.list berharga 100 unit, jadi hanya
+  100 pencarian per hari. Kuota hari pertama habis oleh gabungan
+  pengujian + judul-judul baru yang dibuka (tiap judul baru sampai
+  2 pencarian). Selama kuota habis, SEMUA judul jatuh ke tautan
+  pencarian (bukan bug matcher). Reset tengah malam Pasifik
+  (~15:00 WIB). Mitigasi permanen: cache fetch 7 hari, ejaan kedua
+  hanya dicoba bila hasil ejaan pertama < 5 item. Judul hasil API
+  datang ter-escape (&#39;) dan WAJIB didekode sebelum pencocokan.

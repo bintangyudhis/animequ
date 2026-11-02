@@ -138,6 +138,18 @@ function ekorSah(tekor: string): boolean {
   return sisa.length <= 2;
 }
 
+// Judul dari API datang ter-escape HTML (&#39; untuk apostrof).
+// Dekode dulu sebelum pencocokan, kalau tidak inti judul seperti
+// "Journey's End" tidak akan pernah sama dengan patokannya.
+function dekode(teks: string): string {
+  return teks
+    .replace(/&#39;/g, "'")
+    .replace(/&quot;/g, '"')
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">");
+}
+
 // Satu hasil dianggap layak bila lolos semua gerbang: kanal benar,
 // cakupan kata cukup, format sejalan, musim sejalan, dan inti
 // judulnya memang seri yang sama (bukan spin-off atau seri lain
@@ -148,7 +160,7 @@ function layak(
   judulPatokan: string,
   musimPatokan: number | null,
 ): boolean {
-  const mentah = item.snippet?.title;
+  const mentah = item.snippet?.title ? dekode(item.snippet.title) : null;
   if (!mentah) return false;
   if (item.snippet?.channelId !== ID_KANAL_MUSE_INDONESIA) return false;
   if (cakupanKata(mentah, judulPatokan) < 0.6) return false;
@@ -202,7 +214,7 @@ async function cariSekali(
   judul: string,
   format: string | null,
   musimPatokan: number | null,
-): Promise<TemuanMuse | null> {
+): Promise<{ temuan: TemuanMuse | null; jumlahItem: number }> {
   const parameter = new URLSearchParams({
     part: "snippet",
     channelId: ID_KANAL_MUSE_INDONESIA,
@@ -221,32 +233,31 @@ async function cariSekali(
       `https://www.googleapis.com/youtube/v3/search?${parameter}`,
       {
         signal: AbortSignal.timeout(10000),
-        // Cache sehari: ketersediaan video satu judul nyaris tidak
-        // berubah dalam sehari, dan kuota API harian terjaga.
-        next: { revalidate: 86400 },
+        // Cache 7 hari: pencarian API berharga mahal (100 unit dari
+        // kuota harian 10.000), sedangkan ketersediaan video satu
+        // judul nyaris tidak berubah dalam seminggu.
+        next: { revalidate: 604800 },
       },
     );
-    if (!respons.ok) return null;
+    if (!respons.ok) return { temuan: null, jumlahItem: 0 };
     const json = (await respons.json()) as ResponsCari;
-    const lolos = (json.items ?? []).filter((item) =>
+    const semuaItem = json.items ?? [];
+    const lolos = semuaItem.filter((item) =>
       layak(item, format, judul, musimPatokan),
     );
-    const bersih = (teks: string) =>
-      teks
-        .replace(/&#39;/g, "'")
-        .replace(/&quot;/g, '"')
-        .replace(/&amp;/g, "&")
-        .replace(/&lt;/g, "<")
-        .replace(/&gt;/g, ">");
+    const bersih = dekode;
     const playlist = lolos.find(
       (item) => item.id?.kind === "youtube#playlist" && item.id.playlistId,
     );
     if (playlist) {
       return {
-        url: `https://www.youtube.com/playlist?list=${playlist.id?.playlistId}`,
-        judulHasil: bersih(playlist.snippet?.title ?? ""),
-        jenis: "playlist",
-        id: playlist.id?.playlistId ?? "",
+        temuan: {
+          url: `https://www.youtube.com/playlist?list=${playlist.id?.playlistId}`,
+          judulHasil: bersih(playlist.snippet?.title ?? ""),
+          jenis: "playlist",
+          id: playlist.id?.playlistId ?? "",
+        },
+        jumlahItem: semuaItem.length,
       };
     }
     const video = lolos.filter(
@@ -263,15 +274,18 @@ async function cariSekali(
     const pilihan = semuaEpisode ?? episodeSatu ?? video[0];
     if (pilihan) {
       return {
-        url: `https://www.youtube.com/watch?v=${pilihan.id?.videoId}`,
-        judulHasil: bersih(pilihan.snippet?.title ?? ""),
-        jenis: "video",
-        id: pilihan.id?.videoId ?? "",
+        temuan: {
+          url: `https://www.youtube.com/watch?v=${pilihan.id?.videoId}`,
+          judulHasil: bersih(pilihan.snippet?.title ?? ""),
+          jenis: "video",
+          id: pilihan.id?.videoId ?? "",
+        },
+        jumlahItem: semuaItem.length,
       };
     }
-    return null;
+    return { temuan: null, jumlahItem: semuaItem.length };
   } catch {
-    return null;
+    return { temuan: null, jumlahItem: 0 };
   }
 }
 
@@ -288,9 +302,19 @@ export async function cariDiMuseIndonesia(
   const urutan = [judulInggris, judulRomaji].filter(
     (judul): judul is string => Boolean(judul),
   );
+  // Hemat kuota: ejaan kedua hanya dicoba bila pencarian pertama
+  // menghasilkan sedikit item mentah. Bila kanal sudah menjawab
+  // banyak untuk ejaan pertama tetapi tidak ada yang lolos saring,
+  // ejaan lain hampir pasti bernasib sama.
   for (const judul of [...new Set(urutan)]) {
-    const temuan = await cariSekali(kunci, judul, format, musimPatokan);
+    const { temuan, jumlahItem } = await cariSekali(
+      kunci,
+      judul,
+      format,
+      musimPatokan,
+    );
     if (temuan) return temuan;
+    if (jumlahItem >= 5) break;
   }
   return null;
 }

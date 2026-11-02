@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { detailAnime, judulTampil, skorTampil } from "../../../lib/anilist";
 import { labelFormat, labelStatus } from "../../../lib/labelDetail";
@@ -138,7 +139,19 @@ export default async function DetailAnime({
         </p>
       </section>
       <TrailerAnime trailer={anime.trailer} judul={judul} />
-      <TautanResmi tautan={anime.externalLinks} judul={judul} />
+      <Suspense
+        fallback={
+          <p className="text-sm text-muted">
+            Memeriksa tautan nonton resmi…
+          </p>
+        }
+      >
+        <TautanResmi
+          tautan={anime.externalLinks}
+          judul={judul}
+          judulInggris={anime.title.english}
+        />
+      </Suspense>
     </div>
   );
 }

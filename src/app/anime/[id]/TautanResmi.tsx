@@ -1,25 +1,31 @@
+import { cariDiMuseIndonesia } from "../../../lib/youtube";
+
 // Bagian nonton resmi di halaman detail, tiga lapis:
 // 1. Crunchyroll: bila externalLinks AniList (type STREAMING) memuat
 //    tautan Crunchyroll untuk judul ini, tautan itu diangkat jadi
 //    tombol utama.
 // 2. Muse Indonesia: kanal YouTube resmi pemegang lisensi yang
-//    menayangkan anime gratis ber-subtitle Indonesia. AniList tidak
-//    menyediakan tautan per judul ke kanal ini, jadi yang ditautkan
-//    adalah pencarian di dalam kanalnya (@MuseIndonesia/search)
-//    dengan judul ini: kalau judulnya berlisensi di sana, episodenya
-//    muncul dan bisa langsung ditonton. Labelnya jujur sebagai
-//    pencarian, bukan tautan episode karangan.
+//    menayangkan anime gratis ber-subtitle Indonesia. Server mencari
+//    video/playlist judul ini langsung di kanal itu lewat YouTube
+//    Data API (lib/youtube.ts): ketemu, tombolnya mengarah LANGSUNG
+//    ke video episode 1 atau playlist resminya; tidak ketemu (atau
+//    kunci API belum dipasang), jatuh ke tautan pencarian di dalam
+//    kanalnya (@MuseIndonesia/search). Yang ditautkan selalu hasil
+//    pencarian API di kanal resmi itu, bukan URL karangan.
 // 3. Platform streaming resmi lain dari AniList sebagai chip.
 // Semua tautan membuka situs platform masing-masing: login dan
 // langganan diatur platform itu sendiri, Animequ tidak menyimpan
 // sesi atau akun pengunjung.
-export default function TautanResmi({
+export default async function TautanResmi({
   tautan,
   judul,
+  judulInggris,
 }: {
   tautan: { url: string | null; site: string | null; type: string | null }[] | null;
   judul: string;
+  judulInggris: string | null;
 }) {
+  const temuanMuse = await cariDiMuseIndonesia(judul, judulInggris);
   const streaming = (tautan ?? []).filter(
     (item) => item.type === "STREAMING" && item.url && item.site,
   );
@@ -61,6 +67,23 @@ export default function TautanResmi({
           Muse Indonesia menayangkan anime berlisensi resmi dengan
           subtitle Indonesia, gratis tanpa langganan.
         </p>
+        {temuanMuse ? (
+          <div className="flex flex-col gap-1">
+            <a
+              href={temuanMuse.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block w-fit bg-accent px-5 py-2.5 text-sm font-black text-white transition-opacity hover:opacity-85"
+            >
+              {temuanMuse.jenis === "playlist"
+                ? "Nonton playlist resminya di YouTube ↗"
+                : "Nonton langsung di YouTube ↗"}
+            </a>
+            <p className="text-xs leading-relaxed text-muted">
+              {temuanMuse.judulHasil} — di kanal Muse Indonesia.
+            </p>
+          </div>
+        ) : null}
         <div className="flex flex-wrap gap-2">
           <a
             href={cariMuse}

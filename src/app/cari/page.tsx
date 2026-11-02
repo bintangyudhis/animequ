@@ -8,11 +8,14 @@ import HasilPencarian from "./HasilPencarian";
 export default async function Cari({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string | string[] }>;
+  searchParams: Promise<{ q?: string | string[]; page?: string | string[] }>;
 }) {
   const params = await searchParams;
   const mentah = Array.isArray(params.q) ? params.q[0] : params.q;
   const kataKunci = (mentah ?? "").trim();
+  const mentahPage = Array.isArray(params.page) ? params.page[0] : params.page;
+  const nomorPage = Number(mentahPage);
+  const halaman = Number.isInteger(nomorPage) && nomorPage > 0 ? nomorPage : 1;
   return (
     <div className="mx-auto flex max-w-6xl flex-col gap-8 px-4 py-10 sm:px-6 sm:py-14">
       <div className="flex flex-col gap-3">
@@ -27,13 +30,14 @@ export default async function Cari({
       <FormulirPencarian nilaiAwal={kataKunci} />
       {kataKunci ? (
         <Suspense
+          key={`${kataKunci}-${halaman}`}
           fallback={
             <p className="text-sm text-muted">
               Mencari “{kataKunci}” di AniList…
             </p>
           }
         >
-          <HasilPencarian kataKunci={kataKunci} />
+          <HasilPencarian kataKunci={kataKunci} halaman={halaman} />
         </Suspense>
       ) : (
         <p className="border border-line bg-panel p-4 text-sm leading-relaxed text-muted">

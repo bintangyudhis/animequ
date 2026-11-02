@@ -12,12 +12,17 @@ import DaftarGenre from "./DaftarGenre";
 // halaman tidak menunggu fetch AniList.
 export default async function HalamanGenre({
   params,
+  searchParams,
 }: {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ page?: string | string[] }>;
 }) {
   const { slug } = await params;
   const genre = genreDariSlug(slug);
   if (!genre) notFound();
+  const mentahPage = (await searchParams).page;
+  const nomorPage = Number(Array.isArray(mentahPage) ? mentahPage[0] : mentahPage);
+  const halaman = Number.isInteger(nomorPage) && nomorPage > 0 ? nomorPage : 1;
 
   return (
     <div className="mx-auto flex max-w-6xl flex-col gap-8 px-4 py-10 sm:px-6 sm:py-14">
@@ -47,13 +52,14 @@ export default async function HalamanGenre({
         ))}
       </nav>
       <Suspense
+        key={halaman}
         fallback={
           <p className="text-sm text-muted">
             Memuat judul genre {genre.nama} dari AniList…
           </p>
         }
       >
-        <DaftarGenre genre={genre.nama} />
+        <DaftarGenre genre={genre.nama} slug={genre.slug} halaman={halaman} />
       </Suspense>
     </div>
   );

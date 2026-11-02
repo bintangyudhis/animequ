@@ -130,3 +130,14 @@
   dan mengambil data dari API AniList (database katalognya AniList),
   favorit + histori di localStorage pengunjung. Database (Supabase)
   baru perlu bila ada akun + sinkronisasi antar perangkat.
+- Pagination katalog (2 Nov 2026 malam, keluhan Yudhis "kenapa hanya
+  24"): genre dan pencarian kini memakai ambilHalaman (pageInfo
+  AniList: total/currentPage/lastPage/hasNextPage), 50 judul per
+  halaman, navigasi ?page= dengan komponen NavigasiHalaman bersama.
+  Batas 24 sebelumnya adalah perPage halaman pertama saja. Total
+  yang ditampilkan = angka pageInfo asli, dilarang mengarang.
+  Peringkat /peringkat tetap Top 50 by design (itu chart, bukan
+  jelajah katalog). Playlist Muse Indonesia: situs menautkan tab
+  /playlists kanal + pencarian dalam kanal (hasilnya memuat
+  playlist resmi judul bila ada); URL playlist per judul tidak
+  tersedia dari API mana pun yang dipakai, jangan dikarang.

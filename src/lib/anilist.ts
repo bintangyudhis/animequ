@@ -56,6 +56,65 @@ type ResponsAniList = {
   data?: { Page?: { media?: AnimeRingkas[] } };
 };
 
+export type HalamanAnime = {
+  daftar: AnimeRingkas[];
+  total: number;
+  halaman: number;
+  halamanTerakhir: number;
+  adaBerikutnya: boolean;
+};
+
+type ResponsHalaman = {
+  data?: {
+    Page?: {
+      media?: AnimeRingkas[];
+      pageInfo?: {
+        total?: number;
+        currentPage?: number;
+        lastPage?: number;
+        hasNextPage?: boolean;
+      };
+    };
+  };
+};
+
+// Varian halaman dari ambilDaftar: sama-sama gagal-aman (null), tetapi
+// membawa pageInfo AniList supaya pemanggil bisa menelusuri SELURUH
+// hasil lewat ?page=, bukan berhenti di halaman pertama. Total dan
+// jumlah halaman adalah angka asli dari AniList, bukan karangan.
+async function ambilHalaman(
+  query: string,
+  variables: Record<string, unknown>,
+): Promise<HalamanAnime | null> {
+  try {
+    const respons = await fetch(TITIK_AKHIR, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ query, variables }),
+      signal: AbortSignal.timeout(15000),
+      next: { revalidate: 1800 },
+    });
+    if (!respons.ok) return null;
+    const json = (await respons.json()) as ResponsHalaman;
+    const page = json.data?.Page;
+    if (!page?.media) return null;
+    const info = page.pageInfo ?? {};
+    return {
+      daftar: page.media,
+      total: info.total ?? page.media.length,
+      halaman: info.currentPage ?? 1,
+      halamanTerakhir: info.lastPage ?? 1,
+      adaBerikutnya: info.hasNextPage ?? false,
+    };
+  } catch {
+    return null;
+  }
+}
+
+const FRAGMEN_PAGEINFO = `
+  pageInfo { total currentPage lastPage hasNextPage }
+`;
+
 // Satu-satunya jalur keluar ke API eksternal: POST ke endpoint AniList yang
 // tetap, tanpa kunci dan tanpa data pengguna. Gagal fetch (mis. AniList
 // membatasi bot) tidak boleh menggagalkan render: pemanggil menerima null
@@ -84,16 +143,20 @@ async function ambilDaftar(
   }
 }
 
-export function cariAnime(kataKunci: string): Promise<AnimeRingkas[] | null> {
-  return ambilDaftar(
-    `query ($perPage: Int, $search: String) {
-      Page(perPage: $perPage) {
+export function cariAnime(
+  kataKunci: string,
+  halaman: number,
+): Promise<HalamanAnime | null> {
+  return ambilHalaman(
+    `query ($page: Int, $perPage: Int, $search: String) {
+      Page(page: $page, perPage: $perPage) {
+        ${FRAGMEN_PAGEINFO}
         media(type: ANIME, search: $search, sort: SEARCH_MATCH) {
           ${FRAGMEN_ANIME}
         }
       }
     }`,
-    { perPage: 24, search: kataKunci },
+    { page: halaman, perPage: 50, search: kataKunci },
   );
 }
 
@@ -238,17 +301,23 @@ export function daftarTop(): Promise<AnimeRingkas[] | null> {
 // Daftar per genre: judul terpopuler untuk satu genre persis seperti
 // ejaan enum MediaGenre AniList (mis. "Sci-Fi", "Slice of Life").
 // Genre divalidasi pemanggil lewat peta di lib/genre.ts, jadi nilai yang
-// sampai ke query selalu genre resmi.
-export function daftarPerGenre(genre: string): Promise<AnimeRingkas[] | null> {
-  return ambilDaftar(
-    `query ($perPage: Int, $genre: String) {
-      Page(perPage: $perPage) {
+// sampai ke query selalu genre resmi. Hasilnya berhalaman: halaman
+// berapa pun dari genre itu bisa diambil, jadi seluruh katalog genre
+// di AniList bisa dijelajahi sampai habis.
+export function daftarPerGenre(
+  genre: string,
+  halaman: number,
+): Promise<HalamanAnime | null> {
+  return ambilHalaman(
+    `query ($page: Int, $perPage: Int, $genre: String) {
+      Page(page: $page, perPage: $perPage) {
+        ${FRAGMEN_PAGEINFO}
         media(type: ANIME, genre_in: [$genre], sort: POPULARITY_DESC) {
           ${FRAGMEN_ANIME}
         }
       }
     }`,
-    { perPage: 24, genre },
+    { page: halaman, perPage: 50, genre },
   );
 }
 

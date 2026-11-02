@@ -78,7 +78,20 @@ export default function TautanResmi({
           >
             Buka kanalnya ↗
           </a>
+          <a
+            href="https://www.youtube.com/@MuseIndonesia/playlists"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block w-fit border border-line px-5 py-2.5 text-sm font-bold transition-colors hover:border-accent hover:text-accent"
+          >
+            Semua playlist resminya ↗
+          </a>
         </div>
+        <p className="text-xs leading-relaxed text-muted">
+          Kanal ini mengelompokkan tiap judul jadi playlist episode di
+          tab Playlist. Hasil pencarian di dalam kanal juga menampilkan
+          playlist resmi judul itu bila ada.
+        </p>
         <p className="text-xs leading-relaxed text-muted">
           Tombol pertama membuka pencarian judul ini di dalam kanal
           Muse Indonesia. Tidak semua judul ada di sana, tergantung

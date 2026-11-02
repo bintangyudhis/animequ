@@ -103,3 +103,17 @@
   terverifikasi — dicatat jujur di README, bukan diklaim lolos.
   Tidak ada dependensi baru pada Day 14, jadi risikonya tetap sama
   seperti Day 11–13.
+
+## Pembaruan pasca Day 14 (2 Nov 2026, permintaan langsung Yudhis)
+
+- Jelajah per genre: query `daftarPerGenre` (genre_in, POPULARITY_DESC,
+  24 judul) + peta genre resmi di `src/lib/genre.ts` (17 genre enum
+  MediaGenre ke slug). Nama genre dikirim apa adanya ke AniList, jadi
+  ejaan di peta tidak boleh diubah bebas. Slug tak dikenal 404.
+- Tombol nonton Crunchyroll: TautanResmi memisahkan tautan
+  externalLinks yang site-nya mengandung "Crunchyroll" menjadi tombol
+  utama; platform lain tetap chip. Animequ TIDAK PERNAH menanam sesi
+  atau cookie akun streaming pengunjung: tautan selalu keluar ke situs
+  platform, login terjadi di sana. Itu batas desain sejak Day 12.
+- Situs live di https://anime.bintangyudhis.my.id (subdomain dipasang
+  2 Nov 2026, vercel.app 307 redirect ke subdomain).

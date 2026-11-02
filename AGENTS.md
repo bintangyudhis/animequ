@@ -117,3 +117,16 @@
   platform, login terjadi di sana. Itu batas desain sejak Day 12.
 - Situs live di https://anime.bintangyudhis.my.id (subdomain dipasang
   2 Nov 2026, vercel.app 307 redirect ke subdomain).
+- Blok Muse Indonesia (2 Nov 2026 malam, permintaan Yudhis): kanal
+  YouTube resmi @MuseIndonesia (Muse Communication, gratis + sub
+  Indo). AniList externalLinks TIDAK memuat tautan Muse/YouTube per
+  judul (cek sampel One Piece, Jujutsu Kaisen, Frieren, Solo
+  Leveling: hanya Bilibili TV, Crunchyroll, Hulu, Netflix), jadi
+  situs menautkan pencarian dalam kanal
+  (youtube.com/@MuseIndonesia/search?query=<judul>) dan labelnya
+  jujur sebagai pencarian. Jangan pernah mengarang URL episode.
+- Arsitektur animequ ditegaskan lagi ke Yudhis malam itu: tidak ada
+  database milik sendiri BY DESIGN. Server Vercel merender halaman
+  dan mengambil data dari API AniList (database katalognya AniList),
+  favorit + histori di localStorage pengunjung. Database (Supabase)
+  baru perlu bila ada akun + sinkronisasi antar perangkat.

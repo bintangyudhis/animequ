@@ -1,26 +1,35 @@
-// Daftar platform streaming resmi dari externalLinks AniList
-// (type STREAMING). Bila judul ini punya tautan Crunchyroll, tautan
-// itu diangkat jadi tombol utama "Nonton di Crunchyroll"; platform
-// lain tetap tampil sebagai chip di bawahnya. Bila tidak ada tautan
-// streaming sama sekali, bagian ini tidak dirender — situs tidak
-// mengarang tautan nonton. Semua tautan membuka situs platform
-// masing-masing: login dan langganan diatur platform itu sendiri,
-// Animequ tidak menyimpan sesi atau akun pengunjung.
+// Bagian nonton resmi di halaman detail, tiga lapis:
+// 1. Crunchyroll: bila externalLinks AniList (type STREAMING) memuat
+//    tautan Crunchyroll untuk judul ini, tautan itu diangkat jadi
+//    tombol utama.
+// 2. Muse Indonesia: kanal YouTube resmi pemegang lisensi yang
+//    menayangkan anime gratis ber-subtitle Indonesia. AniList tidak
+//    menyediakan tautan per judul ke kanal ini, jadi yang ditautkan
+//    adalah pencarian di dalam kanalnya (@MuseIndonesia/search)
+//    dengan judul ini: kalau judulnya berlisensi di sana, episodenya
+//    muncul dan bisa langsung ditonton. Labelnya jujur sebagai
+//    pencarian, bukan tautan episode karangan.
+// 3. Platform streaming resmi lain dari AniList sebagai chip.
+// Semua tautan membuka situs platform masing-masing: login dan
+// langganan diatur platform itu sendiri, Animequ tidak menyimpan
+// sesi atau akun pengunjung.
 export default function TautanResmi({
   tautan,
+  judul,
 }: {
   tautan: { url: string | null; site: string | null; type: string | null }[] | null;
+  judul: string;
 }) {
   const streaming = (tautan ?? []).filter(
     (item) => item.type === "STREAMING" && item.url && item.site,
   );
-  if (streaming.length === 0) return null;
   const crunchyroll = streaming.filter((item) =>
     (item.site ?? "").toLowerCase().includes("crunchyroll"),
   );
   const lainnya = streaming.filter(
     (item) => !(item.site ?? "").toLowerCase().includes("crunchyroll"),
   );
+  const cariMuse = `https://www.youtube.com/@MuseIndonesia/search?query=${encodeURIComponent(judul)}`;
   return (
     <section className="flex flex-col gap-4">
       <h2 className="border-b border-line pb-2 text-xl font-black tracking-tight">
@@ -46,6 +55,36 @@ export default function TautanResmi({
           </p>
         </div>
       ) : null}
+      <div className="flex flex-col gap-2 border border-line bg-panel p-4">
+        <p className="text-sm leading-relaxed">
+          <span className="font-bold">Gratis di YouTube:</span> kanal
+          Muse Indonesia menayangkan anime berlisensi resmi dengan
+          subtitle Indonesia, gratis tanpa langganan.
+        </p>
+        <div className="flex flex-wrap gap-2">
+          <a
+            href={cariMuse}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block w-fit border border-accent px-5 py-2.5 text-sm font-black text-accent transition-colors hover:bg-accent hover:text-white"
+          >
+            Cari judul ini di Muse Indonesia ↗
+          </a>
+          <a
+            href="https://www.youtube.com/@MuseIndonesia"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block w-fit border border-line px-5 py-2.5 text-sm font-bold transition-colors hover:border-accent hover:text-accent"
+          >
+            Buka kanalnya ↗
+          </a>
+        </div>
+        <p className="text-xs leading-relaxed text-muted">
+          Tombol pertama membuka pencarian judul ini di dalam kanal
+          Muse Indonesia. Tidak semua judul ada di sana, tergantung
+          lisensi tiap judul.
+        </p>
+      </div>
       {lainnya.length > 0 ? (
         <ul className="flex flex-wrap gap-2">
           {lainnya.map((item) => (
@@ -62,10 +101,13 @@ export default function TautanResmi({
           ))}
         </ul>
       ) : null}
-      <p className="text-xs leading-relaxed text-muted">
-        Tautan di atas berasal dari data AniList untuk judul ini dan
-        dibuka di situs platform masing-masing.
-      </p>
+      {streaming.length > 0 ? (
+        <p className="text-xs leading-relaxed text-muted">
+          Tautan Crunchyroll dan platform lain di atas berasal dari
+          data AniList untuk judul ini dan dibuka di situs platform
+          masing-masing.
+        </p>
+      ) : null}
     </section>
   );
 }

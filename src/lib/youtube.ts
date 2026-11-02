@@ -54,6 +54,11 @@ async function cariSekali(
     q: judul,
     type: "video,playlist",
     maxResults: "6",
+    // WAJIB regionCode ID: tanpa ini, API menyaring hasil menurut
+    // wilayah IP pemanggil dan video Muse Indonesia (lisensi
+    // Indonesia) tidak muncul sama sekali dari server luar negeri.
+    regionCode: "ID",
+    relevanceLanguage: "id",
     key: kunci,
   });
   try {
@@ -71,27 +76,39 @@ async function cariSekali(
     const cocokSemua = (json.items ?? []).filter(
       (item) => item.snippet?.title && cocok(item.snippet.title, judul),
     );
+    const bersih = (teks: string) =>
+      teks
+        .replace(/&#39;/g, "'")
+        .replace(/&quot;/g, '"')
+        .replace(/&amp;/g, "&")
+        .replace(/&lt;/g, "<")
+        .replace(/&gt;/g, ">");
     const playlist = cocokSemua.find(
       (item) => item.id?.kind === "youtube#playlist" && item.id.playlistId,
     );
     if (playlist) {
       return {
         url: `https://www.youtube.com/playlist?list=${playlist.id?.playlistId}`,
-        judulHasil: playlist.snippet?.title ?? "",
+        judulHasil: bersih(playlist.snippet?.title ?? ""),
         jenis: "playlist",
       };
     }
     const video = cocokSemua.filter(
       (item) => item.id?.kind === "youtube#video" && item.id.videoId,
     );
-    const episodeSatu = video.find((item) =>
-      /\bep(isode)?\.?\s*0?1\b/i.test(item.snippet?.title ?? ""),
+    // Kanal ini sering mengunggah satu video "Semua Episode" berisi
+    // satu musim penuh: itu target nonton terbaik setelah playlist.
+    const semuaEpisode = video.find((item) =>
+      /semua episode/i.test(item.snippet?.title ?? ""),
     );
-    const pilihan = episodeSatu ?? video[0];
+    const episodeSatu = video.find((item) =>
+      /\b(ep|eps|episode|misi)\.?\s*0?1\b/i.test(item.snippet?.title ?? ""),
+    );
+    const pilihan = semuaEpisode ?? episodeSatu ?? video[0];
     if (pilihan) {
       return {
         url: `https://www.youtube.com/watch?v=${pilihan.id?.videoId}`,
-        judulHasil: pilihan.snippet?.title ?? "",
+        judulHasil: bersih(pilihan.snippet?.title ?? ""),
         jenis: "video",
       };
     }

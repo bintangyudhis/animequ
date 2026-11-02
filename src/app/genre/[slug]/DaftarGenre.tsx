@@ -25,7 +25,7 @@ export default async function DaftarGenre({
     return (
       <p className="border border-line bg-panel p-4 text-sm leading-relaxed text-muted">
         {halaman > 1
-          ? `Halaman ${halaman} kosong: genre ${genre} hanya punya ${hasil.halamanTerakhir} halaman.`
+          ? `Halaman ${halaman} kosong: tidak ada lagi judul untuk genre ${genre} setelah halaman terakhir.`
           : `Belum ada judul yang terdaftar untuk genre ${genre} di AniList.`}
       </p>
     );

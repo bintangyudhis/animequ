@@ -22,7 +22,7 @@ export default async function HasilPencarian({
     return (
       <p className="border border-line bg-panel p-4 text-sm leading-relaxed text-muted">
         {halaman > 1
-          ? `Halaman ${halaman} kosong: pencarian "${kataKunci}" hanya punya ${hasil.halamanTerakhir} halaman.`
+          ? `Halaman ${halaman} kosong: tidak ada lagi hasil untuk pencarian "${kataKunci}" setelah halaman terakhir.`
           : `Tidak ada judul yang cocok dengan "${kataKunci}". Coba kata kunci lain, mis. judul bahasa Inggris atau romaji-nya.`}
       </p>
     );

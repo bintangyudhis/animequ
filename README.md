@@ -36,7 +36,7 @@ trailer dan tautan ke platform streaming resmi.
 - Jelajah per genre (`/genre` dan `/genre/[slug]`): 17 genre resmi
   AniList, tiap halaman menampilkan 24 judul terpopuler genre itu
   (POPULARITY_DESC); chip genre di halaman detail kini menaut ke
-  halaman genrenya, dan slug tak dikenal dijawab 404
+  halaman genrenya, dan slug tak dikenal menampilkan halaman 404
 - Tombol nonton Crunchyroll: bila data AniList untuk satu judul
   memuat tautan streaming Crunchyroll, halaman detail mengangkatnya
   menjadi tombol utama "Nonton di Crunchyroll" di atas tautan

@@ -4,17 +4,12 @@ import { Suspense } from "react";
 import { DAFTAR_GENRE, genreDariSlug } from "../../../lib/genre";
 import DaftarGenre from "./DaftarGenre";
 
-// Halaman satu genre: /genre/<slug>. Hanya 17 slug dari peta genre
-// yang dibuatkan halaman (generateStaticParams + dynamicParams
-// false), jadi slug tak dikenal dijawab 404 sungguhan oleh Next,
-// bukan halaman bergaya 404 berstatus 200. Grid judul dirender di
-// dalam Suspense supaya cangkang halaman tidak menunggu fetch
-// AniList.
-export function generateStaticParams() {
-  return DAFTAR_GENRE.map((genre) => ({ slug: genre.slug }));
-}
-
-export const dynamicParams = false;
+// Halaman satu genre: /genre/<slug>. Slug di luar peta genre resmi
+// menampilkan halaman 404 lewat notFound(), sama seperti id detail
+// yang tidak dikenal (config dynamicParams tidak kompatibel dengan
+// cacheComponents Next 16, jadi pola ini yang dipakai di seluruh
+// situs). Grid judul dirender di dalam Suspense supaya cangkang
+// halaman tidak menunggu fetch AniList.
 export default async function HalamanGenre({
   params,
 }: {

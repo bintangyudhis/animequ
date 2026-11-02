@@ -235,6 +235,23 @@ export function daftarTop(): Promise<AnimeRingkas[] | null> {
   );
 }
 
+// Daftar per genre: judul terpopuler untuk satu genre persis seperti
+// ejaan enum MediaGenre AniList (mis. "Sci-Fi", "Slice of Life").
+// Genre divalidasi pemanggil lewat peta di lib/genre.ts, jadi nilai yang
+// sampai ke query selalu genre resmi.
+export function daftarPerGenre(genre: string): Promise<AnimeRingkas[] | null> {
+  return ambilDaftar(
+    `query ($perPage: Int, $genre: String) {
+      Page(perPage: $perPage) {
+        media(type: ANIME, genre_in: [$genre], sort: POPULARITY_DESC) {
+          ${FRAGMEN_ANIME}
+        }
+      }
+    }`,
+    { perPage: 24, genre },
+  );
+}
+
 export function daftarMusim(
   season: string,
   seasonYear: number,

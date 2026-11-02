@@ -19,6 +19,10 @@ export type TemuanMuse = {
   url: string;
   judulHasil: string;
   jenis: "video" | "playlist";
+  // ID mentah hasil API: dipakai pemutar embed resmi YouTube di
+  // halaman detail, supaya pengunjung bisa menonton tanpa pindah
+  // situs (videonya tetap dari server YouTube).
+  id: string;
 };
 
 type ItemCari = {
@@ -91,6 +95,7 @@ async function cariSekali(
         url: `https://www.youtube.com/playlist?list=${playlist.id?.playlistId}`,
         judulHasil: bersih(playlist.snippet?.title ?? ""),
         jenis: "playlist",
+        id: playlist.id?.playlistId ?? "",
       };
     }
     const video = cocokSemua.filter(
@@ -110,6 +115,7 @@ async function cariSekali(
         url: `https://www.youtube.com/watch?v=${pilihan.id?.videoId}`,
         judulHasil: bersih(pilihan.snippet?.title ?? ""),
         jenis: "video",
+        id: pilihan.id?.videoId ?? "",
       };
     }
     return null;

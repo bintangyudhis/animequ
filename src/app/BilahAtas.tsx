@@ -6,6 +6,7 @@ const TAUTAN = [
   { href: "/#musim-ini", label: "Musim Ini" },
   { href: "/jadwal", label: "Jadwal" },
   { href: "/peringkat", label: "Top" },
+  { href: "/genre", label: "Genre" },
   { href: "/favorit", label: "Favorit" },
   { href: "/histori", label: "Histori" },
 ];

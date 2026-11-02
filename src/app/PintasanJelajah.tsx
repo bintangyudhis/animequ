@@ -12,6 +12,11 @@ const PINTASAN = [
     keterangan: "50 judul dengan skor tertinggi di AniList.",
   },
   {
+    href: "/genre",
+    judul: "Jelajahi per genre",
+    keterangan: "Judul terpopuler per genre: action, romance, sci-fi, dan lainnya.",
+  },
+  {
     href: "/histori",
     judul: "Histori saya",
     keterangan: "Judul yang pernah kamu buka, tersimpan di browser ini.",
@@ -24,7 +29,7 @@ export default function PintasanJelajah() {
   return (
     <section className="flex flex-col gap-4">
       <h2 className="text-xl font-black tracking-tight">Jelajahi lebih jauh</h2>
-      <ul className="grid gap-3 sm:grid-cols-3">
+      <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {PINTASAN.map((item) => (
           <li key={item.href}>
             <Link

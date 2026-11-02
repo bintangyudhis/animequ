@@ -150,6 +150,7 @@ export default async function DetailAnime({
           tautan={anime.externalLinks}
           judul={judul}
           judulInggris={anime.title.english}
+          format={anime.format}
         />
       </Suspense>
     </div>

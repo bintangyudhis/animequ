@@ -20,12 +20,14 @@ export default async function TautanResmi({
   tautan,
   judul,
   judulInggris,
+  format,
 }: {
   tautan: { url: string | null; site: string | null; type: string | null }[] | null;
   judul: string;
   judulInggris: string | null;
+  format: string | null;
 }) {
-  const temuanMuse = await cariDiMuseIndonesia(judul, judulInggris);
+  const temuanMuse = await cariDiMuseIndonesia(judul, judulInggris, format);
   const streaming = (tautan ?? []).filter(
     (item) => item.type === "STREAMING" && item.url && item.site,
   );

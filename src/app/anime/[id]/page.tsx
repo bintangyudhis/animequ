@@ -138,7 +138,7 @@ export default async function DetailAnime({
         </p>
       </section>
       <TrailerAnime trailer={anime.trailer} judul={judul} />
-      <TautanResmi tautan={anime.externalLinks} />
+      <TautanResmi tautan={anime.externalLinks} judul={judul} />
     </div>
   );
 }

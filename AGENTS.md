@@ -159,3 +159,12 @@
   Batas yang harus diingat: pemilik kanal bisa mematikan embed per
   video dan lisensi wilayah tetap berlaku per penonton; tombol
   eksternal selalu dipertahankan sebagai cadangan.
+- Pencocokan sadar format (2 Nov 2026 malam, laporan Yudhis): entri
+  TV Slime sempat tertanam video spin-off "The Slime Diaries" dan
+  OVA karena cakupan kata saja lolos untuk judul sempalan.
+  lib/youtube.ts kini menyaring berlapis: channelId item diperiksa,
+  gerbang format AniList (TV menolak OVA/ONA/movie/special, MOVIE
+  wajib penanda movie, OVA wajib penanda OVA), gerbang musim
+  (termasuk "Musim ke Dua"), dan uji inti judul terpadatkan dengan
+  ekor sah terbatas. Prinsip: tidak ada tautan langsung lebih baik
+  daripada tautan langsung yang salah judul.

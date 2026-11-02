@@ -68,7 +68,28 @@ export default async function TautanResmi({
           subtitle Indonesia, gratis tanpa langganan.
         </p>
         {temuanMuse ? (
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col gap-2">
+            <div className="aspect-video w-full border border-line bg-black">
+              <iframe
+                src={
+                  temuanMuse.jenis === "playlist"
+                    ? `https://www.youtube-nocookie.com/embed/videoseries?list=${temuanMuse.id}`
+                    : `https://www.youtube-nocookie.com/embed/${temuanMuse.id}`
+                }
+                title={temuanMuse.judulHasil}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                loading="lazy"
+                className="h-full w-full"
+              />
+            </div>
+            <p className="text-xs leading-relaxed text-muted">
+              {temuanMuse.judulHasil} — diputar di sini lewat pemutar
+              resmi YouTube dari kanal Muse Indonesia, tanpa pindah
+              situs. Bila pemutar menampilkan pesan pembatasan dari
+              YouTube (sebagian video memang dibatasi pemiliknya),
+              pakai tombol buka di YouTube di bawah.
+            </p>
             <a
               href={temuanMuse.url}
               target="_blank"
@@ -79,9 +100,6 @@ export default async function TautanResmi({
                 ? "Nonton playlist resminya di YouTube ↗"
                 : "Nonton langsung di YouTube ↗"}
             </a>
-            <p className="text-xs leading-relaxed text-muted">
-              {temuanMuse.judulHasil} — di kanal Muse Indonesia.
-            </p>
           </div>
         ) : null}
         <div className="flex flex-wrap gap-2">

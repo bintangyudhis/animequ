@@ -177,3 +177,10 @@
   (~15:00 WIB). Mitigasi permanen: cache fetch 7 hari, ejaan kedua
   hanya dicoba bila hasil ejaan pertama < 5 item. Judul hasil API
   datang ter-escape (&#39;) dan WAJIB didekode sebelum pencocokan.
+- Cache pencarian Muse diperpanjang jadi 30 hari (revalidate
+  2592000) atas pilihan Yudhis 2 Nov 2026 malam, demi irit kuota.
+  Efek samping yang sudah disadari: hasil "tidak ditemukan" ikut
+  tersimpan 30 hari, jadi judul yang baru masuk kanal bisa telat
+  tampil. Perubahan nilai revalidate ikut mengganti kunci cache
+  Next, sehingga deploy ini sekaligus memaksa pencarian segar
+  setelah kuota pulih.

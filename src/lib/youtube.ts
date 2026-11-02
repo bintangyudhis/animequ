@@ -233,10 +233,12 @@ async function cariSekali(
       `https://www.googleapis.com/youtube/v3/search?${parameter}`,
       {
         signal: AbortSignal.timeout(10000),
-        // Cache 7 hari: pencarian API berharga mahal (100 unit dari
-        // kuota harian 10.000), sedangkan ketersediaan video satu
-        // judul nyaris tidak berubah dalam seminggu.
-        next: { revalidate: 604800 },
+        // Cache 30 hari (pilihan Yudhis 2 Nov 2026): pencarian API
+        // berharga mahal (100 unit dari kuota harian 10.000), jadi
+        // tiap judul cukup dicarikan sekali sebulan. Konsekuensinya
+        // judul yang baru ditambahkan Muse Indonesia bisa telat
+        // tampil sampai cache judul itu kedaluwarsa.
+        next: { revalidate: 2592000 },
       },
     );
     if (!respons.ok) return { temuan: null, jumlahItem: 0 };

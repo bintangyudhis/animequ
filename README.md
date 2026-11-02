@@ -33,6 +33,15 @@ trailer dan tautan ke platform streaming resmi.
 - Histori tontonan (localStorage, tanpa akun): setiap halaman detail
   yang dibuka tercatat otomatis (terbaru di atas, maks 50 entri) +
   halaman `/histori` dengan hapus per judul dan hapus semua
+- Jelajah per genre (`/genre` dan `/genre/[slug]`): 17 genre resmi
+  AniList, tiap halaman menampilkan 24 judul terpopuler genre itu
+  (POPULARITY_DESC); chip genre di halaman detail kini menaut ke
+  halaman genrenya, dan slug tak dikenal dijawab 404
+- Tombol nonton Crunchyroll: bila data AniList untuk satu judul
+  memuat tautan streaming Crunchyroll, halaman detail mengangkatnya
+  menjadi tombol utama "Nonton di Crunchyroll" di atas tautan
+  platform resmi lainnya. Tautan membuka situs Crunchyroll, login
+  dan langganan diatur Crunchyroll sendiri
 - Polish Day 14: tema gelap "Layar" diseragamkan (fokus keyboard di
   semua input, seleksi aksen, tautan lewati ke konten, footer
   bertautan rute, loading dan pesan gagal dalam panel, tombol dan
@@ -68,6 +77,7 @@ npm run build
 - `/anime/[id]` detail: sinopsis, trailer, tautan platform resmi
 - `/jadwal` jadwal rilis 7 hari ke depan per hari WIB
 - `/peringkat` chart top 50 anime
+- `/genre` indeks genre dan `/genre/[slug]` judul terpopuler per genre
 - `/favorit` dan `/histori` (localStorage, tanpa akun)
 
 ## Status

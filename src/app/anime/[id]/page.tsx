@@ -5,6 +5,7 @@ import { detailAnime, judulTampil, skorTampil } from "../../../lib/anilist";
 import { labelFormat, labelStatus } from "../../../lib/labelDetail";
 import { bersihkanDeskripsi } from "../../../lib/teks";
 import { episodeTampil } from "../../../lib/musim";
+import { slugDariNama } from "../../../lib/genre";
 import TombolFavorit from "../../TombolFavorit";
 import PencatatHistori from "./PencatatHistori";
 import TrailerAnime from "./TrailerAnime";
@@ -92,14 +93,25 @@ export default async function DetailAnime({
           </dl>
           {(anime.genres ?? []).length > 0 ? (
             <ul className="flex flex-wrap gap-2">
-              {(anime.genres ?? []).map((genre) => (
-                <li
-                  key={genre}
-                  className="border border-line bg-panel px-3 py-1 text-xs font-bold"
-                >
-                  {genre}
-                </li>
-              ))}
+              {(anime.genres ?? []).map((genre) => {
+                const slug = slugDariNama(genre);
+                return (
+                  <li key={genre}>
+                    {slug ? (
+                      <Link
+                        href={`/genre/${slug}`}
+                        className="block border border-line bg-panel px-3 py-1 text-xs font-bold transition-colors hover:border-accent hover:text-accent"
+                      >
+                        {genre}
+                      </Link>
+                    ) : (
+                      <span className="block border border-line bg-panel px-3 py-1 text-xs font-bold">
+                        {genre}
+                      </span>
+                    )}
+                  </li>
+                );
+              })}
             </ul>
           ) : null}
           <div className="flex flex-wrap gap-3">

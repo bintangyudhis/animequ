@@ -71,8 +71,16 @@ npm install
 npm run dev
 ```
 
-Tidak ada variabel environment yang wajib diisi: AniList tidak memakai
-kunci. Build lokal:
+Satu variabel environment opsional di server (Vercel):
+
+- `YOUTUBE_API_KEY` — kunci YouTube Data API v3. Bila terisi, halaman
+  detail mencari video/playlist judul itu langsung di kanal resmi
+  Muse Indonesia dan tombolnya mengarah ke video/playlist-nya.
+  Bila kosong, tombol jatuh ke pencarian di dalam kanal. Kunci ini
+  hanya dipakai di server, tidak pernah masuk repo.
+
+Selain itu tidak ada variabel environment yang wajib diisi: AniList
+tidak memakai kunci. Build lokal:
 
 ```bash
 npm run build

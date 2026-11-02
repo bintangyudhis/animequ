@@ -141,3 +141,13 @@
   /playlists kanal + pencarian dalam kanal (hasilnya memuat
   playlist resmi judul bila ada); URL playlist per judul tidak
   tersedia dari API mana pun yang dipakai, jangan dikarang.
+- Tautan LANGSUNG Muse Indonesia (2 Nov 2026 malam, permintaan
+  Yudhis "harus mengarah ke videonya langsung"): lib/youtube.ts
+  memakai YouTube Data API v3 resmi, pencarian dibatasi channelId
+  UCxxnxya_32jcKj4yN1_kD7A (ID resmi @MuseIndonesia, diverifikasi
+  dari canonical URL kanalnya). Prioritas hasil: playlist yang
+  cocok, lalu video episode 1, lalu video pertama yang cocok
+  (kecocokan = >=60% kata penting judul muncul di judul hasil).
+  Kunci di env server YOUTUBE_API_KEY (Vercel), TIDAK di repo.
+  Tanpa kunci / tidak ketemu: fallback pencarian dalam kanal.
+  Cache fetch 24 jam menjaga kuota (10rb unit/hari bawaan Google).

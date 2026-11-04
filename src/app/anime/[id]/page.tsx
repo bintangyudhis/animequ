@@ -151,6 +151,8 @@ export default async function DetailAnime({
           judul={judul}
           judulInggris={anime.title.english}
           format={anime.format}
+          sinonim={anime.synonyms}
+          jumlahEpisode={anime.episodes}
         />
       </Suspense>
     </div>

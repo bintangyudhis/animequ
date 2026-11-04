@@ -25,6 +25,7 @@ export function judulTampil(anime: AnimeRingkas): string {
 export type AnimeDetail = AnimeRingkas & {
   description: string | null;
   format: string | null;
+  synonyms: string[] | null;
   status: string | null;
   bannerImage: string | null;
   trailer: { id: string | null; site: string | null } | null;
@@ -201,6 +202,7 @@ export async function detailAnime(id: number): Promise<AnimeDetail | null> {
             ${FRAGMEN_ANIME}
             description
             format
+            synonyms
             status
             bannerImage
             trailer { id site }

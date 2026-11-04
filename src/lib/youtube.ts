@@ -19,6 +19,12 @@
 // - Musim harus sejalan: entri musim pertama menolak hasil
 //   berpenanda musim 2+, entri musim ke-N hanya menerima hasil
 //   berpenanda musim yang sama.
+// - Video promosi (cuplikan, trailer, teaser, PV) selalu ditolak:
+//   itu bukan tontonan. Kasus nyata 3 Nov 2026: Demon Slayer musim
+//   pertama tertanam "Cuplikan ... Babak Pelatihan Hashira Eps 02".
+// - Kata asing di luar judul patokan dan ekor sah selalu ditolak,
+//   jadi nama arc atau musim lain tidak bisa menumpang lolos lewat
+//   cakupan kata saja (perbaikan kasus yang sama).
 
 const ID_KANAL_MUSE_INDONESIA = "UCxxnxya_32jcKj4yN1_kD7A";
 
@@ -138,6 +144,26 @@ function ekorSah(tekor: string): boolean {
   return sisa.length <= 2;
 }
 
+// Kata inti judul hasil dalam bentuk token, untuk uji ketat:
+// semua token hasil harus berasal dari judul patokan atau daftar
+// ekor sah. "Babak Pelatihan Hashira" gugur di sini karena babak,
+// pelatihan, dan hashira bukan bagian judul "Kimetsu no Yaiba".
+function tokenInti(judulHasil: string): string[] {
+  let teks = judulHasil.toLowerCase();
+  teks = teks.replace(/\[[^\]]*\]/g, " ").replace(/\([^)]*\)/g, " ");
+  teks = teks.split(/\s+-\s+(?=(episode|ep|eps|misi|#))/)[0];
+  teks = teks.split(/\s+(?=(episode|ep|eps|misi)\s*\d)/)[0];
+  return teks.replace(/[^a-z0-9\s]/g, " ").split(/\s+/).filter(Boolean);
+}
+
+function tokenJudul(judul: string): string[] {
+  return judul
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, " ")
+    .split(/\s+/)
+    .filter(Boolean);
+}
+
 // Judul dari API datang ter-escape HTML (&#39; untuk apostrof).
 // Dekode dulu sebelum pencocokan, kalau tidak inti judul seperti
 // "Journey's End" tidak akan pernah sama dengan patokannya.
@@ -164,6 +190,10 @@ function layak(
   if (!mentah) return false;
   if (item.snippet?.channelId !== ID_KANAL_MUSE_INDONESIA) return false;
   if (cakupanKata(mentah, judulPatokan) < 0.6) return false;
+  // Video promosi bukan tontonan: kanal menamai trailer resminya
+  // "Cuplikan ...", dan kasus Demon Slayer 3 Nov 2026 membuktikan
+  // cuplikan bisa lolos semua gerbang lain.
+  if (/\b(cuplikan|trailer|teaser|pv)\b/i.test(mentah)) return false;
 
   const penanda = penandaDari(mentah);
   const formatBersih = (format ?? "TV").toUpperCase();
@@ -204,9 +234,24 @@ function layak(
   if (inti.startsWith(padatPatokan)) {
     return ekorSah(inti.slice(padatPatokan.length));
   }
-  // Urutan kata bisa berbeda di judul kanal; terima hanya bila
-  // cakupannya penuh dan tidak ada penanda asing.
-  return cakupanKata(mentah, judulPatokan) >= 0.99;
+  // Jalan terakhir (urutan kata berbeda): semua kata patokan harus
+  // ada DAN tidak boleh ada kata asing di luar patokan dan ekor
+  // sah. Cakupan penuh saja tidak cukup, karena nama arc musim
+  // lain bisa menumpang di ekor judul, seperti kasus Demon Slayer.
+  const tokenPatokan = new Set(tokenJudul(judulPatokan));
+  const diizinkan = new Set([
+    ...tokenPatokan,
+    ...EKOR_SAH,
+    ...Object.keys(ANGKA_KATA),
+  ]);
+  const tokenHasil = tokenInti(mentah);
+  const patokanLengkap = [...tokenPatokan].every((kata) =>
+    tokenHasil.includes(kata),
+  );
+  const tanpaKataAsing = tokenHasil.every(
+    (kata) => diizinkan.has(kata) || /^\d+$/.test(kata),
+  );
+  return patokanLengkap && tanpaKataAsing;
 }
 
 async function cariSekali(
@@ -304,19 +349,13 @@ export async function cariDiMuseIndonesia(
   const urutan = [judulInggris, judulRomaji].filter(
     (judul): judul is string => Boolean(judul),
   );
-  // Hemat kuota: ejaan kedua hanya dicoba bila pencarian pertama
-  // menghasilkan sedikit item mentah. Bila kanal sudah menjawab
-  // banyak untuk ejaan pertama tetapi tidak ada yang lolos saring,
-  // ejaan lain hampir pasti bernasib sama.
+  // Kedua ejaan selalu dicoba sampai ada yang lolos saring: judul
+  // di kanal bisa memakai ejaan romaji saat patokan Inggris tidak
+  // cocok, dan sebaliknya. Biayanya aman karena tiap query ter-cache
+  // 30 hari, jadi satu judul maksimal 2 pencarian per bulan.
   for (const judul of [...new Set(urutan)]) {
-    const { temuan, jumlahItem } = await cariSekali(
-      kunci,
-      judul,
-      format,
-      musimPatokan,
-    );
+    const { temuan } = await cariSekali(kunci, judul, format, musimPatokan);
     if (temuan) return temuan;
-    if (jumlahItem >= 5) break;
   }
   return null;
 }

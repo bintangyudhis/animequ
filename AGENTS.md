@@ -184,3 +184,19 @@
   tampil. Perubahan nilai revalidate ikut mengganti kunci cache
   Next, sehingga deploy ini sekaligus memaksa pencarian segar
   setelah kuota pulih.
+- Poster jebol karena kuota optimasi gambar Vercel (5 Nov 2026):
+  plan gratis tim habis 2 Nov malam (5.000 transformasi), ukuran
+  yang belum terolah menjawab 402, dan layar HP rapat piksel justru
+  memilih ukuran itu. Perbaikan atas persetujuan Yudhis: images
+  unoptimized true di next.config, poster dimuat langsung dari CDN
+  AniList dan tidak tergantung kuota Vercel lagi.
+- Pencocokan Muse diperketat lagi (5 Nov 2026, kasus crosscheck
+  Demon Slayer): hasil berpenanda cuplikan/trailer/teaser/PV selalu
+  ditolak, dan jalan terakhir cakupan kata diganti uji token ketat
+  (semua kata patokan ada, nol kata asing di luar patokan + ekor
+  sah) supaya nama arc musim lain tidak menumpang. Kedua ejaan
+  kini selalu dicoba sampai ada temuan, karena saringan ketat
+  membuat ejaan pertama lebih sering kosong; biaya aman oleh
+  cache 30 hari per query. Uji luring 12 kasus lolos semua,
+  termasuk kasus baik Spy x Family, Frieren, Mushoku, Slime OVA
+  yang tidak boleh ikut gugur.

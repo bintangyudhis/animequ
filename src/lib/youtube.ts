@@ -51,7 +51,7 @@ export type TemuanMuse = {
 
 type ItemCari = {
   id?: { kind?: string; videoId?: string; playlistId?: string };
-  snippet?: { title?: string; channelId?: string };
+  snippet?: { title?: string; channelId?: string; description?: string };
 };
 
 type ResponsCari = { items?: ItemCari[] };
@@ -211,6 +211,28 @@ function jangkarSinonim(judulHasil: string, sinonim: string[]): boolean {
   });
 }
 
+// Bukti deskripsi: deskripsi playlist resmi kanal membuka dengan
+// judul asli seri itu (Jepang lalu Inggris), baru genre dan
+// sinopsis, mis. playlist "Pernikahan Kunang-kunang" berdeskripsi
+// "... Firefly Wedding Genre: Romansa ..." dan "Sihir Sang
+// Pengulang Jelas Istimewa" berdeskripsi "A Returner's Magic
+// Should be Special ...". Judul patokan yang muncul utuh di 200
+// karakter pertama deskripsi adalah bukti identitas yang sama
+// kuatnya dengan jangkar sinonim, untuk judul playlist yang
+// berbahasa Indonesia penuh dan tidak punya sinonim di AniList.
+// Patokan pendek (di bawah 8 huruf terpadatkan) tidak diterima,
+// supaya judul generik tidak kebetulan tercantum di sinopsis
+// seri lain.
+function buktiDeskripsi(
+  deskripsi: string | undefined,
+  judulPatokan: string,
+): boolean {
+  if (!deskripsi) return false;
+  const padatPatokan = padatkan(judulPatokan);
+  if (padatPatokan.length < 8) return false;
+  return padatkan(dekode(deskripsi).slice(0, 200)).includes(padatPatokan);
+}
+
 // Satu hasil dianggap layak bila lolos semua gerbang: kanal benar,
 // format sejalan, musim sejalan, nomor episode tidak melebihi
 // jumlah episode entri ini, dan identitas serinya terbukti, entah
@@ -284,7 +306,8 @@ function layak(
     // kedua (2026) sama-sama berjudul Indonesia dan sama-sama
     // lolos gerbang format; hanya satu yang benar untuk entri ini.
     if (formatBersih === "MOVIE") return false;
-    return jangkarSinonim(mentah, sinonim);
+    if (jangkarSinonim(mentah, sinonim)) return true;
+    return buktiDeskripsi(item.snippet?.description, judulPatokan);
   }
 
   // Inti: harus diawali judul patokan dengan ekor yang sah, supaya
@@ -426,7 +449,7 @@ async function ambilItem(kunci: string, kueri: string): Promise<ItemCari[]> {
 
 type ItemPlaylist = {
   id?: string;
-  snippet?: { title?: string };
+  snippet?: { title?: string; description?: string };
 };
 
 type ResponsPlaylist = {
@@ -470,6 +493,7 @@ async function ambilIndeksPlaylist(kunci: string): Promise<ItemCari[]> {
           snippet: {
             title: item.snippet?.title ?? "",
             channelId: ID_KANAL_MUSE_INDONESIA,
+            description: item.snippet?.description ?? "",
           },
         });
       }

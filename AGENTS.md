@@ -261,3 +261,26 @@
   gabungan (pool asli JJK, Solo, CSM, DS, Slime Movie, Slime TV,
   OVA + kasus sintetis) disimpan di hidden_files/fixture-muse
   goal streak karena /tmp di VM ini tersapu agresif.
+- Indeks playlist + bukti deskripsi (5 Nov 2026, perintah Yudhis
+  "link harus langsung ke playlistnya, perbaiki ke seluruh
+  anime"): lib/youtube.ts kini mengambil SELURUH playlist resmi
+  kanal lewat playlists.list (415 playlist, 9 halaman x 1 unit,
+  cache 30 hari) dan menilainya SEBELUM pencarian. Temuan dari
+  indeks selalu playlist: pemutar memutar playlistnya dan tombol
+  membuka playlist itu langsung. Kata "highlight" ditambahkan ke
+  daftar promosi yang ditolak (ada playlist Highlight Mushoku
+  yang bukan episode). Bukti baru untuk judul playlist berbahasa
+  Indonesia penuh: deskripsi playlist kanal membuka dengan judul
+  asli seri itu, jadi judul patokan yang muncul utuh di 200
+  karakter pertama deskripsi menjadi bukti identitas (kasus
+  "Pernikahan Kunang-kunang" = Hotaru no Yomeiri dan "Sihir Sang
+  Pengulang Jelas Istimewa" = Kikansha no Mahou musim 1, keduanya
+  kini terhubung live). Larangan jangkar untuk MOVIE berlaku juga
+  untuk bukti deskripsi. Disiplin musim tetap menang atas bukti
+  deskripsi: Kikansha musim 2 tetap hanya tautan karena
+  playlistnya tanpa penanda musim. Inventaris kanal sekaligus
+  membuktikan Jujutsu Kaisen, Solo Leveling, Chainsaw Man, One
+  Piece, Conan, dan Black Clover memang tidak ditayangkan kanal
+  ini (nol playlist), bukan sekadar tidak ketemu pencarian.
+  Fixture indeks + deskripsi dan suite tes-indeks.mjs disimpan di
+  hidden_files/fixture-muse goal streak.

@@ -228,3 +228,24 @@
   jangkar ("Tensura" lolos saring, "Kimetsu no Yaiba" gugur).
   Hasil live final: Slime TV memutar kompilasi musim 1 yang
   benar, Demon Slayer kembali hanya tautan, Frieren tidak berubah.
+- Penyesuaian menyeluruh pencocokan Muse (5 Nov 2026, perintah
+  Yudhis "kalau ada di Muse berarti bisa diputar, harus sesuai
+  formatnya"): diagnosis API asli untuk Jujutsu Kaisen, Solo
+  Leveling, Chainsaw Man, Demon Slayer S1, dan Slime Movie.
+  Temuan: untuk JJK, Solo, dan CSM, 25 hasil pencarian per ejaan
+  tidak memuat satu pun video seri itu (isinya seri lain semua),
+  dan Demon Slayer hanya memuat arc lanjutan plus materi promosi,
+  jadi hanya tautan adalah jawaban yang benar untuk keempatnya
+  saat ini. Peningkatan umum yang dipasang: maxResults 8 ke 25
+  (biaya unit sama), item semua kueri digabung lalu dinilai
+  terhadap patokan asli (bukan kata kunci), kueri tambahan dari
+  sinonim khas, dan gerbang durasi video 10 menit lewat
+  videos.list (1 unit per batch) untuk membunuh PV, CM, dan
+  highlight yang lolos gerbang judul. Jangkar sinonim DILARANG
+  untuk format MOVIE karena dua movie satu seri berbagi jangkar
+  yang sama (Scarlet Bond 2022 vs movie Tensura 2026 tidak bisa
+  dibedakan jangkar). Slime Movie tetap hanya tautan: unggahan
+  resminya "Bereinkarnasi Malah Menjadi Slime the Movie: Babak
+  Hubungan Kirmizi" tidak memuat satu pun bukti identitas yang
+  bisa diverifikasi mesin; pemetaan manual per judul menunggu
+  keputusan Yudhis.

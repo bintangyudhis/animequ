@@ -262,6 +262,13 @@ function layak(
   // judul kanal kemungkinan memakai bahasa atau terjemahan lain:
   // identitasnya hanya bisa dibuktikan jangkar sinonim.
   if (cakupanKata(mentah, judulPatokan) < 0.6) {
+    // Jangkar TIDAK berlaku untuk MOVIE: dua movie dari seri yang
+    // sama berbagi jangkar seri yang sama, jadi jangkar tidak bisa
+    // membedakan movie satu dari movie lainnya. Kasus nyata yang
+    // dicegah di sini: movie Scarlet Bond (2022) dan movie Tensura
+    // kedua (2026) sama-sama berjudul Indonesia dan sama-sama
+    // lolos gerbang format; hanya satu yang benar untuk entri ini.
+    if (formatBersih === "MOVIE") return false;
     return jangkarSinonim(mentah, sinonim);
   }
 
@@ -292,20 +299,82 @@ function layak(
   return patokanLengkap && tanpaKataAsing;
 }
 
-async function cariSekali(
+// Durasi ISO 8601 dari API ("PT1H47M32S") menjadi detik.
+function durasiDetik(iso: string): number {
+  const cocok = iso.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
+  if (!cocok) return 0;
+  return (
+    Number(cocok[1] ?? 0) * 3600 +
+    Number(cocok[2] ?? 0) * 60 +
+    Number(cocok[3] ?? 0)
+  );
+}
+
+// Gerbang durasi untuk kandidat video: tontonan asli berdurasi
+// panjang (episode sekitar 24 menit, kompilasi berjam-jam),
+// sedangkan PV, CM, cuplikan, preview, dan highlight hampir selalu
+// di bawah 10 menit. Judul saja tidak cukup membedakan keduanya,
+// durasi fisiknya yang membedakan. Satu panggilan videos.list
+// berharga 1 unit untuk sampai 50 video sekaligus. Bila panggilan
+// ini gagal, kandidat dipertahankan apa adanya: gerbang judul
+// tetap menjadi saringan utama dan durasi hanya lapis kedua.
+const DURASI_MINIMUM_DETIK = 600;
+
+async function saringDurasi(
+  kandidat: ItemCari[],
   kunci: string,
-  judul: string,
-  format: string | null,
-  musimPatokan: number | null,
-  sinonim: string[] = [],
-  jumlahEpisode: number | null = null,
-): Promise<{ temuan: TemuanMuse | null; jumlahItem: number }> {
+): Promise<ItemCari[]> {
+  const ids = kandidat
+    .map((item) => item.id?.videoId)
+    .filter((id): id is string => Boolean(id));
+  if (ids.length === 0) return kandidat;
+  try {
+    const parameter = new URLSearchParams({
+      part: "contentDetails",
+      id: ids.join(","),
+      key: kunci,
+    });
+    const respons = await fetch(
+      `https://www.googleapis.com/youtube/v3/videos?${parameter}`,
+      {
+        signal: AbortSignal.timeout(10000),
+        next: { revalidate: 2592000 },
+      },
+    );
+    if (!respons.ok) return kandidat;
+    const json = (await respons.json()) as {
+      items?: { id?: string; contentDetails?: { duration?: string } }[];
+    };
+    const peta = new Map<string, number>();
+    for (const item of json.items ?? []) {
+      if (item.id && item.contentDetails?.duration) {
+        peta.set(item.id, durasiDetik(item.contentDetails.duration));
+      }
+    }
+    if (peta.size === 0) return kandidat;
+    return kandidat.filter((item) => {
+      const detik = item.id?.videoId ? peta.get(item.id.videoId) : undefined;
+      return detik === undefined || detik >= DURASI_MINIMUM_DETIK;
+    });
+  } catch {
+    return kandidat;
+  }
+}
+
+// Satu pencarian mentah ke API, item dikembalikan apa adanya.
+// Penilaian kecocokan dilakukan terpisah oleh pilihTemuan, supaya
+// item dari semua kueri bisa digabung dulu lalu dinilai terhadap
+// judul patokan yang sebenarnya, bukan terhadap kata kuncinya.
+async function ambilItem(kunci: string, kueri: string): Promise<ItemCari[]> {
   const parameter = new URLSearchParams({
     part: "snippet",
     channelId: ID_KANAL_MUSE_INDONESIA,
-    q: judul,
+    q: kueri,
     type: "video,playlist",
-    maxResults: "8",
+    // 25 hasil per pencarian: biaya unit API sama untuk jumlah
+    // berapa pun sampai 50, dan 8 terbukti terlalu sempit karena
+    // hasil teratas sering dikuasai seri lain atau musim lain.
+    maxResults: "25",
     // WAJIB regionCode ID: tanpa ini, API menyaring hasil menurut
     // wilayah IP pemanggil dan video Muse Indonesia (lisensi
     // Indonesia) tidak muncul sama sekali dari server luar negeri.
@@ -326,54 +395,65 @@ async function cariSekali(
         next: { revalidate: 2592000 },
       },
     );
-    if (!respons.ok) return { temuan: null, jumlahItem: 0 };
+    if (!respons.ok) return [];
     const json = (await respons.json()) as ResponsCari;
-    const semuaItem = json.items ?? [];
-    const lolos = semuaItem.filter((item) =>
-      layak(item, format, judul, musimPatokan, sinonim, jumlahEpisode),
-    );
-    const bersih = dekode;
-    const playlist = lolos.find(
-      (item) => item.id?.kind === "youtube#playlist" && item.id.playlistId,
-    );
-    if (playlist) {
-      return {
-        temuan: {
-          url: `https://www.youtube.com/playlist?list=${playlist.id?.playlistId}`,
-          judulHasil: bersih(playlist.snippet?.title ?? ""),
-          jenis: "playlist",
-          id: playlist.id?.playlistId ?? "",
-        },
-        jumlahItem: semuaItem.length,
-      };
-    }
-    const video = lolos.filter(
-      (item) => item.id?.kind === "youtube#video" && item.id.videoId,
-    );
-    // Kanal ini sering mengunggah satu video "Semua Episode" berisi
-    // satu musim penuh: itu target nonton terbaik setelah playlist.
-    const semuaEpisode = video.find((item) =>
-      /semua episode/i.test(item.snippet?.title ?? ""),
-    );
-    const episodeSatu = video.find((item) =>
-      /\b(ep|eps|episode|misi)\.?\s*0?1\b/i.test(item.snippet?.title ?? ""),
-    );
-    const pilihan = semuaEpisode ?? episodeSatu ?? video[0];
-    if (pilihan) {
-      return {
-        temuan: {
-          url: `https://www.youtube.com/watch?v=${pilihan.id?.videoId}`,
-          judulHasil: bersih(pilihan.snippet?.title ?? ""),
-          jenis: "video",
-          id: pilihan.id?.videoId ?? "",
-        },
-        jumlahItem: semuaItem.length,
-      };
-    }
-    return { temuan: null, jumlahItem: semuaItem.length };
+    return json.items ?? [];
   } catch {
-    return { temuan: null, jumlahItem: 0 };
+    return [];
   }
+}
+
+// Nilai kumpulan item terhadap SATU judul patokan dan pilih
+// temuan terbaiknya: playlist resmi dulu, lalu video "Semua
+// Episode", lalu episode 1, lalu video lolos pertama.
+async function pilihTemuan(
+  semuaItem: ItemCari[],
+  kunci: string,
+  format: string | null,
+  judulPatokan: string,
+  musimPatokan: number | null,
+  sinonim: string[],
+  jumlahEpisode: number | null,
+): Promise<TemuanMuse | null> {
+  const lolos = semuaItem.filter((item) =>
+    layak(item, format, judulPatokan, musimPatokan, sinonim, jumlahEpisode),
+  );
+  const bersih = dekode;
+  const playlist = lolos.find(
+    (item) => item.id?.kind === "youtube#playlist" && item.id.playlistId,
+  );
+  if (playlist) {
+    return {
+      url: `https://www.youtube.com/playlist?list=${playlist.id?.playlistId}`,
+      judulHasil: bersih(playlist.snippet?.title ?? ""),
+      jenis: "playlist",
+      id: playlist.id?.playlistId ?? "",
+    };
+  }
+  const video = await saringDurasi(
+    lolos.filter(
+      (item) => item.id?.kind === "youtube#video" && item.id.videoId,
+    ),
+    kunci,
+  );
+  // Kanal ini sering mengunggah satu video "Semua Episode" berisi
+  // satu musim penuh: itu target nonton terbaik setelah playlist.
+  const semuaEpisode = video.find((item) =>
+    /semua episode/i.test(item.snippet?.title ?? ""),
+  );
+  const episodeSatu = video.find((item) =>
+    /\b(ep|eps|episode|misi)\.?\s*0?1\b/i.test(item.snippet?.title ?? ""),
+  );
+  const pilihan = semuaEpisode ?? episodeSatu ?? video[0];
+  if (pilihan) {
+    return {
+      url: `https://www.youtube.com/watch?v=${pilihan.id?.videoId}`,
+      judulHasil: bersih(pilihan.snippet?.title ?? ""),
+      jenis: "video",
+      id: pilihan.id?.videoId ?? "",
+    };
+  }
+  return null;
 }
 
 export async function cariDiMuseIndonesia(
@@ -414,20 +494,41 @@ export async function cariDiMuseIndonesia(
   const urutan = [judulInggris, judulRomaji].filter(
     (judul): judul is string => Boolean(judul),
   );
-  // Kedua ejaan selalu dicoba sampai ada yang lolos saring: judul
-  // di kanal bisa memakai ejaan romaji saat patokan Inggris tidak
-  // cocok, dan sebaliknya. Biayanya aman karena tiap query ter-cache
-  // 30 hari, jadi satu judul maksimal 2 pencarian per bulan.
-  for (const judul of [...new Set(urutan)]) {
-    const { temuan } = await cariSekali(
-      kunci,
-      judul,
-      format,
-      musimPatokan,
-      sinonimJangkar,
-      jumlahEpisode,
-    );
-    if (temuan) return temuan;
+  // Semua ejaan dicoba sampai ada yang lolos saring: judul Inggris,
+  // judul romaji, lalu sinonim khas sebagai kata kunci pencarian
+  // (kanal bisa memakai judul alternatif resmi, mis. nama pendek
+  // serinya). Total dibatasi 4 pencarian per judul, dan tiap query
+  // ter-cache 30 hari, jadi biayanya tetap kecil.
+  const kueriSinonim = sinonimJangkar
+    .filter((s) => padatkan(s).length >= 5)
+    .slice(0, 2);
+  const semuaKueri = [...new Set([...urutan, ...kueriSinonim])].slice(0, 4);
+  // Item dari semua kueri digabung (dedupe per ID hasil) lalu
+  // dinilai terhadap tiap patokan. Kueri dijalankan satu per satu
+  // dan penilaian diulang tiap ada kumpulan baru, supaya judul
+  // yang mudah ketemu tidak membayar kueri tambahan.
+  const terkumpul: ItemCari[] = [];
+  const sudahAda = new Set<string>();
+  for (const kueri of semuaKueri) {
+    const itemBaru = await ambilItem(kunci, kueri);
+    for (const item of itemBaru) {
+      const idHasil = item.id?.videoId ?? item.id?.playlistId ?? "";
+      if (idHasil && sudahAda.has(idHasil)) continue;
+      if (idHasil) sudahAda.add(idHasil);
+      terkumpul.push(item);
+    }
+    for (const patokan of urutan) {
+      const temuan = await pilihTemuan(
+        terkumpul,
+        kunci,
+        format,
+        patokan,
+        musimPatokan,
+        sinonimJangkar,
+        jumlahEpisode,
+      );
+      if (temuan) return temuan;
+    }
   }
   return null;
 }

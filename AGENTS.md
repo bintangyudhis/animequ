@@ -216,3 +216,15 @@
   sesuai harapan (kompilasi musim 1 dan Episode 01 lolos; Diaries,
   OAD, movie, musim 2 dan 3, episode besar gugur) dan 12 kasus lama
   tidak berubah.
+- Jangkar sinonim diperketat di hari yang sama (5 Nov 2026):
+  verifikasi live menemukan playlist "Kimetsu no Yaiba: Pembasmi
+  Iblis (Babak Kereta Api Mugen) - Preview" lolos untuk Demon
+  Slayer musim 1, karena sinonim AniList yang beririsan judul
+  utama ("Kimetsu no Yaiba") mengesahkan judul satu bahasa yang
+  ekornya nama arc lain, dan kata "Preview" belum ada di daftar
+  promosi. Perbaikan: kata preview ditolak, dan sinonim jangkar
+  disaring di cariDiMuseIndonesia, hanya sinonim yang tidak
+  beririsan dengan judul romaji maupun Inggris yang boleh jadi
+  jangkar ("Tensura" lolos saring, "Kimetsu no Yaiba" gugur).
+  Hasil live final: Slime TV memutar kompilasi musim 1 yang
+  benar, Demon Slayer kembali hanya tautan, Frieren tidak berubah.

@@ -176,20 +176,44 @@ function dekode(teks: string): string {
     .replace(/&gt;/g, ">");
 }
 
+// Nomor episode eksplisit di judul hasil, mis. "Episode 89".
+// Kanal memakai penomoran berlanjut antar musim, jadi nomor yang
+// melebihi jumlah episode entri ini pasti milik musim lain.
+function nomorEpisodeDari(judul: string): number | null {
+  const cocok = judul.toLowerCase().match(/\b(?:episode|ep|eps|misi)\.?\s*(\d+)/);
+  return cocok ? Number(cocok[1]) : null;
+}
+
+// Jangkar sinonim: kanal kadang menamai seri dengan judul
+// terjemahan Indonesia plus nama pendek resminya, mis. Slime jadi
+// "(Tensura) Bereinkarnasi Malah Menjadi Slime", yang tidak memuat
+// satu pun kata judul AniList. Sinonim khas dari AniList (dipadatkan
+// minimal 5 huruf) yang muncul di judul hasil menjadi bukti
+// identitas serinya, selama semua gerbang lain sudah lolos.
+function jangkarSinonim(judulHasil: string, sinonim: string[]): boolean {
+  const padatHasil = padatkan(judulHasil);
+  return sinonim.some((s) => {
+    const padat = padatkan(s);
+    return padat.length >= 5 && padatHasil.includes(padat);
+  });
+}
+
 // Satu hasil dianggap layak bila lolos semua gerbang: kanal benar,
-// cakupan kata cukup, format sejalan, musim sejalan, dan inti
-// judulnya memang seri yang sama (bukan spin-off atau seri lain
-// yang judulnya menumpang judul ini).
+// format sejalan, musim sejalan, nomor episode tidak melebihi
+// jumlah episode entri ini, dan identitas serinya terbukti, entah
+// lewat inti judul yang cocok dengan patokan, atau lewat jangkar
+// sinonim untuk judul kanal yang berbahasa lain.
 function layak(
   item: ItemCari,
   format: string | null,
   judulPatokan: string,
   musimPatokan: number | null,
+  sinonim: string[] = [],
+  jumlahEpisode: number | null = null,
 ): boolean {
   const mentah = item.snippet?.title ? dekode(item.snippet.title) : null;
   if (!mentah) return false;
   if (item.snippet?.channelId !== ID_KANAL_MUSE_INDONESIA) return false;
-  if (cakupanKata(mentah, judulPatokan) < 0.6) return false;
   // Video promosi bukan tontonan: kanal menamai trailer resminya
   // "Cuplikan ...", dan kasus Demon Slayer 3 Nov 2026 membuktikan
   // cuplikan bisa lolos semua gerbang lain.
@@ -227,6 +251,20 @@ function layak(
     if (!intiHasil(mentah).startsWith(padatkan(judulPatokan))) return false;
   }
 
+  // Nomor episode: penomoran kanal berlanjut antar musim, jadi
+  // nomor di atas jumlah episode entri ini pasti musim lain.
+  const nomorEp = nomorEpisodeDari(mentah);
+  if (nomorEp !== null && jumlahEpisode !== null && nomorEp > jumlahEpisode) {
+    return false;
+  }
+
+  // Bila kata judul hasil nyaris tidak beririsan dengan patokan,
+  // judul kanal kemungkinan memakai bahasa atau terjemahan lain:
+  // identitasnya hanya bisa dibuktikan jangkar sinonim.
+  if (cakupanKata(mentah, judulPatokan) < 0.6) {
+    return jangkarSinonim(mentah, sinonim);
+  }
+
   // Inti: harus diawali judul patokan dengan ekor yang sah, supaya
   // spin-off dan seri sempalan tidak lolos.
   const inti = intiHasil(mentah);
@@ -259,6 +297,8 @@ async function cariSekali(
   judul: string,
   format: string | null,
   musimPatokan: number | null,
+  sinonim: string[] = [],
+  jumlahEpisode: number | null = null,
 ): Promise<{ temuan: TemuanMuse | null; jumlahItem: number }> {
   const parameter = new URLSearchParams({
     part: "snippet",
@@ -290,7 +330,7 @@ async function cariSekali(
     const json = (await respons.json()) as ResponsCari;
     const semuaItem = json.items ?? [];
     const lolos = semuaItem.filter((item) =>
-      layak(item, format, judul, musimPatokan),
+      layak(item, format, judul, musimPatokan, sinonim, jumlahEpisode),
     );
     const bersih = dekode;
     const playlist = lolos.find(
@@ -340,6 +380,8 @@ export async function cariDiMuseIndonesia(
   judulRomaji: string,
   judulInggris: string | null,
   format: string | null,
+  sinonim: string[] = [],
+  jumlahEpisode: number | null = null,
 ): Promise<TemuanMuse | null> {
   const kunci = process.env.YOUTUBE_API_KEY;
   if (!kunci) return null;
@@ -354,7 +396,14 @@ export async function cariDiMuseIndonesia(
   // cocok, dan sebaliknya. Biayanya aman karena tiap query ter-cache
   // 30 hari, jadi satu judul maksimal 2 pencarian per bulan.
   for (const judul of [...new Set(urutan)]) {
-    const { temuan } = await cariSekali(kunci, judul, format, musimPatokan);
+    const { temuan } = await cariSekali(
+      kunci,
+      judul,
+      format,
+      musimPatokan,
+      sinonim,
+      jumlahEpisode,
+    );
     if (temuan) return temuan;
   }
   return null;

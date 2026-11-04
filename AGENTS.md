@@ -200,3 +200,19 @@
   cache 30 hari per query. Uji luring 12 kasus lolos semua,
   termasuk kasus baik Spy x Family, Frieren, Mushoku, Slime OVA
   yang tidak boleh ikut gugur.
+- Slime TV akhirnya ketemu (5 Nov 2026, laporan Yudhis "kan ada di
+  Muse"): kanal menamai seri ini dengan judul Indonesia
+  "(Tensura) Bereinkarnasi Malah Menjadi Slime", nol irisan kata
+  dengan judul AniList, jadi semua hasil gugur di cakupan kata.
+  Diagnosis memakai data API asli: 16 item hasil pencarian diperiksa
+  satu per satu. Perbaikan: sinonim AniList (field synonyms kini
+  diambil di query detail) menjadi jangkar identitas bila cakupan
+  kata rendah, dengan syarat sinonim khas (terpadatkan minimal 5
+  huruf) muncul di judul hasil dan semua gerbang lain lolos.
+  Ditambah gerbang nomor episode: penomoran kanal berlanjut antar
+  musim, jadi nomor episode di atas jumlah episode entri ini pasti
+  musim lain (kasus Slime: episode 76 sampai 96 untuk entri 24
+  episode). Uji luring: 16 item asli Slime terklasifikasi semua
+  sesuai harapan (kompilasi musim 1 dan Episode 01 lolos; Diaries,
+  OAD, movie, musim 2 dan 3, episode besar gugur) dan 12 kasus lama
+  tidak berubah.

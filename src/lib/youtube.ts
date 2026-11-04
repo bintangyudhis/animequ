@@ -19,9 +19,20 @@
 // - Musim harus sejalan: entri musim pertama menolak hasil
 //   berpenanda musim 2+, entri musim ke-N hanya menerima hasil
 //   berpenanda musim yang sama.
-// - Video promosi (cuplikan, trailer, teaser, PV) selalu ditolak:
-//   itu bukan tontonan. Kasus nyata 3 Nov 2026: Demon Slayer musim
-//   pertama tertanam "Cuplikan ... Babak Pelatihan Hashira Eps 02".
+// - Video promosi (cuplikan, trailer, teaser, PV, highlight)
+//   selalu ditolak: itu bukan tontonan. Kasus nyata 3 Nov 2026:
+//   Demon Slayer musim pertama tertanam "Cuplikan ... Babak
+//   Pelatihan Hashira Eps 02".
+// - Sumber pertama yang dinilai adalah INDEKS PLAYLIST resmi
+//   kanal (playlists.list, 415 playlist per Nov 2026): kanal
+//   mengelompokkan tiap seri jadi playlist episode, jadi temuan
+//   dari sini selalu berjenis playlist dan tombolnya mengarah
+//   langsung ke playlist itu di YouTube, bukan ke kanal. Indeks
+//   berharga 1 unit per halaman (50 playlist) dan ter-cache 30
+//   hari, jadi praktis gratis dibanding pencarian (100 unit).
+//   Pencarian tetap dipakai sebagai lapis kedua untuk judul yang
+//   playlistnya tidak lolos saring, mis. yang hanya punya video
+//   kompilasi "Semua Episode" atau episode lepas.
 // - Kata asing di luar judul patokan dan ekor sah selalu ditolak,
 //   jadi nama arc atau musim lain tidak bisa menumpang lolos lewat
 //   cakupan kata saja (perbaikan kasus yang sama).
@@ -219,7 +230,9 @@ function layak(
   // Video promosi bukan tontonan: kanal menamai trailer resminya
   // "Cuplikan ...", dan kasus Demon Slayer 3 Nov 2026 membuktikan
   // cuplikan bisa lolos semua gerbang lain.
-  if (/\b(cuplikan|trailer|teaser|preview|pv)\b/i.test(mentah)) return false;
+  if (/\b(cuplikan|trailer|teaser|preview|pv|highlight)\b/i.test(mentah)) {
+    return false;
+  }
 
   const penanda = penandaDari(mentah);
   const formatBersih = (format ?? "TV").toUpperCase();
@@ -411,6 +424,64 @@ async function ambilItem(kunci: string, kueri: string): Promise<ItemCari[]> {
   }
 }
 
+type ItemPlaylist = {
+  id?: string;
+  snippet?: { title?: string };
+};
+
+type ResponsPlaylist = {
+  items?: ItemPlaylist[];
+  nextPageToken?: string;
+};
+
+// Indeks playlist resmi kanal dari playlists.list. Berbeda dengan
+// pencarian yang peringkatnya bisa dikuasai seri lain, daftar ini
+// adalah inventaris lengkap kanal, jadi judul yang memang tidak
+// ditayangkan kanal tidak akan muncul di sini sama sekali
+// (terbukti Nov 2026: Jujutsu Kaisen, Solo Leveling, dan Chainsaw
+// Man nol playlist). Tiap halaman berharga 1 unit dan ter-cache
+// 30 hari seperti pencarian.
+async function ambilIndeksPlaylist(kunci: string): Promise<ItemCari[]> {
+  const semua: ItemCari[] = [];
+  let token: string | undefined;
+  // Pengaman 20 halaman (1.000 playlist); kanal saat ini 415.
+  for (let halaman = 0; halaman < 20; halaman++) {
+    const parameter = new URLSearchParams({
+      part: "snippet",
+      channelId: ID_KANAL_MUSE_INDONESIA,
+      maxResults: "50",
+      key: kunci,
+    });
+    if (token) parameter.set("pageToken", token);
+    try {
+      const respons = await fetch(
+        `https://www.googleapis.com/youtube/v3/playlists?${parameter}`,
+        {
+          signal: AbortSignal.timeout(10000),
+          next: { revalidate: 2592000 },
+        },
+      );
+      if (!respons.ok) break;
+      const json = (await respons.json()) as ResponsPlaylist;
+      for (const item of json.items ?? []) {
+        if (!item.id) continue;
+        semua.push({
+          id: { kind: "youtube#playlist", playlistId: item.id },
+          snippet: {
+            title: item.snippet?.title ?? "",
+            channelId: ID_KANAL_MUSE_INDONESIA,
+          },
+        });
+      }
+      token = json.nextPageToken;
+      if (!token) break;
+    } catch {
+      break;
+    }
+  }
+  return semua;
+}
+
 // Nilai kumpulan item terhadap SATU judul patokan dan pilih
 // temuan terbaiknya: playlist resmi dulu, lalu video "Semua
 // Episode", lalu episode 1, lalu video lolos pertama.
@@ -511,6 +582,26 @@ export async function cariDiMuseIndonesia(
     .filter((s) => padatkan(s).length >= 5)
     .slice(0, 2);
   const semuaKueri = [...new Set([...urutan, ...kueriSinonim])].slice(0, 4);
+  // Indeks playlist dinilai sebelum pencarian apa pun: temuan dari
+  // sini selalu playlist resmi seri itu, jadi pemutarnya memutar
+  // seluruh episode berurutan dan tombolnya membuka playlistnya
+  // langsung, sesuai permintaan Yudhis 5 Nov 2026 agar tautan
+  // tidak berhenti di kanal.
+  const indeksPlaylist = await ambilIndeksPlaylist(kunci);
+  if (indeksPlaylist.length > 0) {
+    for (const patokan of urutan) {
+      const temuan = await pilihTemuan(
+        indeksPlaylist,
+        kunci,
+        format,
+        patokan,
+        musimPatokan,
+        sinonimJangkar,
+        jumlahEpisode,
+      );
+      if (temuan) return temuan;
+    }
+  }
   // Item dari semua kueri digabung (dedupe per ID hasil) lalu
   // dinilai terhadap tiap patokan. Kueri dijalankan satu per satu
   // dan penilaian diulang tiap ada kumpulan baru, supaya judul

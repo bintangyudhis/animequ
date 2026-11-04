@@ -144,15 +144,17 @@ function ekorSah(tekor: string): boolean {
   return sisa.length <= 2;
 }
 
-// Kata inti judul hasil dalam bentuk token, untuk uji ketat:
-// semua token hasil harus berasal dari judul patokan atau daftar
-// ekor sah. "Babak Pelatihan Hashira" gugur di sini karena babak,
-// pelatihan, dan hashira bukan bagian judul "Kimetsu no Yaiba".
-function tokenInti(judulHasil: string): string[] {
-  let teks = judulHasil.toLowerCase();
-  teks = teks.replace(/\[[^\]]*\]/g, " ").replace(/\([^)]*\)/g, " ");
-  teks = teks.split(/\s+-\s+(?=(episode|ep|eps|misi|#))/)[0];
-  teks = teks.split(/\s+(?=(episode|ep|eps|misi)\s*\d)/)[0];
+// Semua token judul hasil tanpa memotong ekor episode, untuk
+// uji kelengkapan patokan: akhiran format pada judul AniList
+// (OVA, OAD) bisa berpindah ke segmen episode di judul kanal,
+// mis. patokan "...Slime OAD" dan hasil "...Slime - Episode
+// OAD 01". Inti yang terpotong kehilangan kata OAD-nya, jadi
+// kelengkapan harus dinilai dari judul penuh.
+function tokenPenuh(judulHasil: string): string[] {
+  const teks = judulHasil
+    .toLowerCase()
+    .replace(/\[[^\]]*\]/g, " ")
+    .replace(/\([^)]*\)/g, " ");
   return teks.replace(/[^a-z0-9\s]/g, " ").split(/\s+/).filter(Boolean);
 }
 
@@ -280,16 +282,22 @@ function layak(
     return ekorSah(inti.slice(padatPatokan.length));
   }
   // Jalan terakhir (urutan kata berbeda): semua kata patokan harus
-  // ada DAN tidak boleh ada kata asing di luar patokan dan ekor
-  // sah. Cakupan penuh saja tidak cukup, karena nama arc musim
-  // lain bisa menumpang di ekor judul, seperti kasus Demon Slayer.
+  // ada di judul PENUH (akhiran format patokan bisa duduk di
+  // segmen episode hasil, lihat tokenPenuh) DAN tidak boleh ada
+  // kata asing di luar patokan, ekor sah, dan kata penanda
+  // struktural (ep, eps, misi). Cakupan penuh saja tidak cukup,
+  // karena nama arc musim lain bisa menumpang di ekor judul,
+  // seperti kasus Demon Slayer.
   const tokenPatokan = new Set(tokenJudul(judulPatokan));
   const diizinkan = new Set([
     ...tokenPatokan,
     ...EKOR_SAH,
     ...Object.keys(ANGKA_KATA),
+    "ep",
+    "eps",
+    "misi",
   ]);
-  const tokenHasil = tokenInti(mentah);
+  const tokenHasil = tokenPenuh(mentah);
   const patokanLengkap = [...tokenPatokan].every((kata) =>
     tokenHasil.includes(kata),
   );

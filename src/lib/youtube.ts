@@ -217,7 +217,7 @@ function layak(
   // Video promosi bukan tontonan: kanal menamai trailer resminya
   // "Cuplikan ...", dan kasus Demon Slayer 3 Nov 2026 membuktikan
   // cuplikan bisa lolos semua gerbang lain.
-  if (/\b(cuplikan|trailer|teaser|pv)\b/i.test(mentah)) return false;
+  if (/\b(cuplikan|trailer|teaser|preview|pv)\b/i.test(mentah)) return false;
 
   const penanda = penandaDari(mentah);
   const formatBersih = (format ?? "TV").toUpperCase();
@@ -388,6 +388,29 @@ export async function cariDiMuseIndonesia(
   const musimPatokan =
     penandaDari(judulInggris ?? "").musim ??
     penandaDari(judulRomaji).musim;
+  // Jangkar hanya untuk sinonim yang BENAR-BENAR berbeda dari
+  // judul utama: sinonim yang sama atau beririsan dengan judul
+  // romaji/Inggris dibuang, karena sinonim semacam itu bisa
+  // mengesahkan judul sempalan satu bahasa yang ekornya berisi
+  // nama arc lain. Kasus nyata 5 Nov 2026: playlist "Kimetsu no
+  // Yaiba: Pembasmi Iblis (Babak Kereta Api Mugen) - Preview"
+  // lolos jangkar untuk entri musim pertama.
+  const padatRomaji = padatkan(judulRomaji);
+  const padatInggris = judulInggris ? padatkan(judulInggris) : "";
+  const sinonimJangkar = sinonim.filter((s) => {
+    const padat = padatkan(s);
+    if (padat.length < 5) return false;
+    if (padatRomaji.includes(padat) || padat.includes(padatRomaji)) {
+      return false;
+    }
+    if (
+      padatInggris &&
+      (padatInggris.includes(padat) || padat.includes(padatInggris))
+    ) {
+      return false;
+    }
+    return true;
+  });
   const urutan = [judulInggris, judulRomaji].filter(
     (judul): judul is string => Boolean(judul),
   );
@@ -401,7 +424,7 @@ export async function cariDiMuseIndonesia(
       judul,
       format,
       musimPatokan,
-      sinonim,
+      sinonimJangkar,
       jumlahEpisode,
     );
     if (temuan) return temuan;

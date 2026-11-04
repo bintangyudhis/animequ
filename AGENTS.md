@@ -249,3 +249,15 @@
   Hubungan Kirmizi" tidak memuat satu pun bukti identitas yang
   bisa diverifikasi mesin; pemetaan manual per judul menunggu
   keputusan Yudhis.
+- Regresi OVA dari uji token ketat (5 Nov 2026, tertangkap
+  verifikasi live): entri Slime OVA sempat kembali hanya tautan.
+  Sebabnya akhiran format patokan ("...Slime OAD") hilang dari
+  inti hasil karena judul kanal meletakkannya di segmen episode
+  ("- Episode OAD 01") yang terpotong oleh intiHasil, sehingga
+  uji kelengkapan token selalu gagal. Perbaikan: kelengkapan dan
+  kata asing kini dinilai dari tokenPenuh (judul penuh tanpa
+  potongan ekor episode), kata penanda struktural ep/eps/misi
+  diizinkan. tokenInti yang tak terpakai dihapus. Suite uji
+  gabungan (pool asli JJK, Solo, CSM, DS, Slime Movie, Slime TV,
+  OVA + kasus sintetis) disimpan di hidden_files/fixture-muse
+  goal streak karena /tmp di VM ini tersapu agresif.
